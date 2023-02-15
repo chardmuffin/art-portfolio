@@ -4,7 +4,12 @@ const bcrypt = require('bcrypt');
 
 
 
-class User extends Model {}
+class User extends Model {
+  async checkPassword(loginPw) {
+    let isMatch = await bcrypt.compare(loginPw, this.password);
+    return isMatch;
+  }
+}
 
 User.init(
   

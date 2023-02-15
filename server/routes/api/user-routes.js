@@ -48,6 +48,32 @@ router.post('/', (req, res) => {
     });
 });
 
+// login
+// POST /api/users/login 
+router.post('/login', (req, res) => {
+  // expects {email: 'exampleUser@gmail.com', password: 'password1234'}
+  User.findOne({
+    where: {
+      email: req.body.email
+    }
+  })
+    .then(async dbUserData => {
+      if (!dbUserData) {
+        res.status(400).json({ message: 'Email and/or password is not valid.' });
+        return;
+      }
+
+      const isValidPassword = await dbUserData.checkPassword(req.body.password);
+      if (!isValidPassword) {
+        res.status(400).json({ message: 'Email and/or password is not valid.' });
+        return;
+      }
+
+      res.json({ user: dbUserData, message: 'You are now logged in!' });
+    });
+
+});
+
 // PUT /api/users/1
 router.put('/:id', (req, res) => {
   // expects {email: 'exampleUser@gmail.com', password: 'password1234'}
