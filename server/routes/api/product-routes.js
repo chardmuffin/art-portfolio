@@ -49,8 +49,10 @@ router.post('/', (req, res) => {
   /* req.body should look like this...
     {
       product_name: "Basketball",
+      description: "A bouncy ball for shooting hoops."
       price: 200.00,
       stock: 3,
+      productOptionIds: [1, 2]
       tagIds: [1, 2, 3, 4]
     }
   */
