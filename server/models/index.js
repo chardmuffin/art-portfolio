@@ -1,53 +1,95 @@
 const User = require('./User');
 const Order = require('./Order');
-const OrderItem = require('./OrderItem')
+const OrderDetail = require('./OrderDetail');
 const Product = require('./Product');
 const Category = require('./Category');
 const Tag = require('./Tag');
 const ProductTag = require('./ProductTag');
-const ProductVariant = require('./ProductVariant')
+const ProductOption = require('./ProductOption');
+const Option = require('./Option');
+const OptionGroup = require('./OptionGroup');
 
-// Products belong to Categories
-Product.belongsTo(Category, {
-  foreignKey: 'category_id'
-})
-
-// Categories have many Products
+// Categories and Products
 Category.hasMany(Product, {
   foreignKey: 'category_id'
-})
+});
 
-// Products belong to many Tags (through ProductTag)
+Product.belongsTo(Category, {
+  foreignKey: 'category_id'
+});
+
+// Products and Tags
 Product.belongsToMany(Tag, {
   through: ProductTag,
   foreignKey: 'product_id'
-})
+});
 
-// Tags belong to many Products (through ProductTag)
 Tag.belongsToMany(Product, {
   through: ProductTag,
   foreignKey: 'tag_id'
-})
+});
 
-Product.hasMany(ProductVariant, {
+// Products and Product Options
+Product.hasMany(ProductOption, {
   foreignKey: 'product_id',
 });
 
+ProductOption.belongsTo(Product, {
+  foreignKey: 'product_id'
+});
+
+// Product Options and Option Groups
+ProductOption.belongsTo(Option, {
+  foreignKey: 'option_id'
+});
+
+ProductOption.belongsTo(OptionGroup, {
+  foreignKey: 'option_group_id'
+});
+
+Option.belongsTo(OptionGroup, {
+  foreignKey: 'option_group_id'
+});
+
+OptionGroup.hasMany(Option, {
+  foreignKey: 'option_group_id'
+});
+
+// Orders, Users, and Order Items
 User.hasMany(Order, {
-  foreignKey: 'order_id'
+  foreignKey: 'user_id'
 });
 
 Order.belongsTo(User, {
-  foreignKey: 'order_id'
-})
+  foreignKey: 'user_id'
+});
 
-Order.hasMany(OrderItem, {
+Order.hasMany(OrderDetail, {
   foreignKey: 'order_id',
   onDelete: 'CASCADE'
 });
 
-OrderItem.belongsTo(Order, {
+OrderDetail.belongsTo(Order, {
   foreignKey: 'order_id'
 });
 
-module.exports = { User, Order, OrderItem, Product, Category, Tag, ProductTag, ProductVariant };
+OrderDetail.belongsTo(Product, {
+  foreignKey: 'product_id'
+});
+
+OrderDetail.belongsTo(ProductOption, {
+  foreignKey: 'product_option_id'
+});
+
+module.exports = {
+  User,
+  Order,
+  OrderDetail,
+  Product,
+  Category,
+  Tag,
+  ProductTag,
+  ProductOption,
+  Option,
+  OptionGroup
+};

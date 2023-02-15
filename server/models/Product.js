@@ -3,6 +3,11 @@ const sequelize = require('../config/connection');
 
 class Product extends Model {}
 
+// each product is a family
+// e.g product "smiley face t-shirt" includes:
+// smiley face t-shirt small, smiley face t-shirt medium, smiley face t-shirt large, etc.
+// product has a base price that is altered based on productOption's option_price_multiplier
+// stock will be the stock of all associated productOption added together
 Product.init(
   {
     id: {
@@ -17,6 +22,10 @@ Product.init(
     },
     description: {
       type: DataTypes.TEXT,
+      allowNull: false
+    },
+    price: {
+      type: DataTypes.DECIMAL,
       allowNull: false
     },
     stock: {

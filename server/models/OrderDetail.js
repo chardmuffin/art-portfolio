@@ -1,9 +1,10 @@
 const { Model, DataTypes } = require('sequelize');
 const sequelize = require('../config/connection');
 
-class OrderItem extends Model {}
+class OrderDetail extends Model {}
 
-OrderItem.init(
+// Order detail is like a single line item on an itemized bill
+OrderDetail.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -11,10 +12,25 @@ OrderItem.init(
       primaryKey: true,
       autoIncrement: true
     },
+    order_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'order',
+        key: 'id'
+      }
+    },
     product_id: {
       type: DataTypes.INTEGER,
       references: {
         model: 'product',
+        key: 'id'
+      }
+    },
+    product_option_id: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'product_option',
         key: 'id'
       }
     },
@@ -31,8 +47,8 @@ OrderItem.init(
     sequelize,
     freezeTableName: true,
     underscored: true,
-    modelName: 'order_item'
+    modelName: 'order_detail'
   }
 );
 
-module.exports = OrderItem;
+module.exports = OrderDetail;

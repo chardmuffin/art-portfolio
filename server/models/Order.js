@@ -3,6 +3,7 @@ const sequelize = require('../config/connection');
 
 class Order extends Model {}
 
+// Order contains several OrderDetail
 Order.init(
   {
     id: {
@@ -10,6 +11,13 @@ Order.init(
       allowNull: false,
       primaryKey: true,
       autoIncrement: true
+    },
+    order_user_id: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'user',
+        key: 'id'
+      }
     },
     status: {
       type: DataTypes.STRING,
