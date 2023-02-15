@@ -38,6 +38,9 @@ OrderDetail.init(
       type: DataTypes.INTEGER,
       allowNull: false
     },
+
+    // price = quantity * price of associated productOption
+    // this calculation is done upon OrderDetail creation (PUSH) in routes file
     price: {
       type: DataTypes.DECIMAL,
       allowNull: false

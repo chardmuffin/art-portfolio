@@ -28,6 +28,9 @@ Product.init(
       type: DataTypes.DECIMAL,
       allowNull: false
     },
+
+    // stock = summation of all associated ProductOption stock.
+    // calculation is done on creation of product (PUSH) in routes file
     stock: {
       type: DataTypes.INTEGER,
       allowNull: false,
