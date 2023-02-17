@@ -20,13 +20,6 @@ OrderDetail.init(
         key: 'id'
       }
     },
-    product_id: {
-      type: DataTypes.INTEGER,
-      references: {
-        model: 'product',
-        key: 'id'
-      }
-    },
     product_option_id: {
       type: DataTypes.INTEGER,
       references: {
@@ -40,7 +33,7 @@ OrderDetail.init(
     },
 
     // price = quantity * price of associated productOption
-    // this calculation is done upon OrderDetail creation (PUSH) in routes file
+    // this calculation is done upon OrderDetail creation (PUSH) in order routes file
     price: {
       type: DataTypes.DECIMAL,
       allowNull: false

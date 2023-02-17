@@ -1,6 +1,9 @@
 const router = require('express').Router();
 const { User } = require('../../models');
 
+// the `/api/users` endpoint
+
+// get all users
 // GET /api/users
 router.get('/', (req, res) => {
   User.findAll({
@@ -13,6 +16,7 @@ router.get('/', (req, res) => {
     });
 });
 
+// get a single user by id
 // GET /api/users/1
 router.get('/:id', (req, res) => {
   User.findOne({
@@ -34,9 +38,10 @@ router.get('/:id', (req, res) => {
     });
 });
 
+// create a new user
 // POST /api/users
+// expects {email: 'exampleUser@gmail.com', password: 'password1234'}
 router.post('/', (req, res) => {
-  // expects {email: 'exampleUser@gmail.com', password: 'password1234'}
   User.create({
     email: req.body.email,
     password: req.body.password
@@ -49,9 +54,9 @@ router.post('/', (req, res) => {
 });
 
 // login
-// POST /api/users/login 
+// POST /api/users/login
+// expects {email: 'exampleUser@gmail.com', password: 'password1234'}
 router.post('/login', (req, res) => {
-  // expects {email: 'exampleUser@gmail.com', password: 'password1234'}
   User.findOne({
     where: {
       email: req.body.email
@@ -74,10 +79,10 @@ router.post('/login', (req, res) => {
 
 });
 
+// update user
 // PUT /api/users/1
+// expects {email: 'exampleUser@gmail.com', password: 'password1234'}
 router.put('/:id', (req, res) => {
-  // expects {email: 'exampleUser@gmail.com', password: 'password1234'}
-
   User.update(req.body, {
     individualHooks: true,
     where: {
@@ -97,6 +102,7 @@ router.put('/:id', (req, res) => {
     });
 });
 
+// delete a user by id
 // DELETE /api/users/1
 router.delete('/:id', (req, res) => {
   User.destroy({

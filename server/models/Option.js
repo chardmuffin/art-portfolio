@@ -16,6 +16,13 @@ Option.init(
     option_name: {
       type: DataTypes.STRING,
       allowNull: false
+    },
+    option_group_id: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'option_group',
+        key: 'id'
+      }
     }
   },
   {
@@ -24,6 +31,12 @@ Option.init(
     freezeTableName: true,
     underscored: true,
     modelName: 'option',
+    indexes: [
+      {
+        unique: true,
+        fields: ['option_name', 'option_group_id']
+      }
+    ]
   }
 );
 

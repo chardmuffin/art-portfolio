@@ -3,7 +3,7 @@ const sequelize = require('../config/connection');
 
 class ProductOption extends Model {}
 
-// ProductOption is the interesection of a particular product (tshirt) with an option (x-large)
+// ProductOption is the intersection of a particular product (tshirt) with an option (x-large)
 ProductOption.init(
   {
     id: {
@@ -33,14 +33,6 @@ ProductOption.init(
       allowNull: false,
       references: {
         model: 'option',
-        key: 'id'
-      }
-    },
-    option_group_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'option_group',
         key: 'id'
       }
     }

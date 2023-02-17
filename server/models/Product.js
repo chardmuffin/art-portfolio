@@ -22,18 +22,18 @@ Product.init(
     },
     description: {
       type: DataTypes.TEXT,
-      allowNull: false
+      allowNull: true
     },
     price: {
       type: DataTypes.DECIMAL,
-      allowNull: false
+      allowNull: true
     },
 
     // stock = summation of all associated ProductOption stock.
-    // calculation is done on creation of product (PUSH) in routes file
+    // calculation is done on creation of product (PUSH) in product routes file
     stock: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
       defaultValue: 0,
       validate: {
         isNumeric: true
