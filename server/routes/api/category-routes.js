@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const { Category, Product } = require('../../models');
+const { Sequelize } = require('sequelize');
 
 // The `/api/categories` endpoint
 
@@ -7,7 +8,10 @@ const { Category, Product } = require('../../models');
 // GET /api/categories
 router.get('/', async (req, res) => {
   Category.findAll({
-    include: Product
+    attributes: [
+      'category_name',
+      [Sequelize.literal('(SELECT COUNT(*) FROM product WHERE product.category_id = Category.id)'), 'product_count']
+    ]
   })
     .then(dbCategoryData => res.json(dbCategoryData))
     .catch(err => {
@@ -21,7 +25,10 @@ router.get('/', async (req, res) => {
 router.get('/:id', (req, res) => {
   Category.findOne({
     where: { id: req.params.id },
-    include: Product
+    attributes: [
+      'category_name',
+      [Sequelize.literal('(SELECT COUNT(*) FROM product WHERE product.category_id = Category.id)'), 'product_count']
+    ]
   })
     .then(dbCategoryData => res.json(dbCategoryData))
     .catch(err => {

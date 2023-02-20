@@ -1,5 +1,6 @@
 const router = require('express').Router();
-const { Option, ProductOption, OptionGroup } = require('../../models');
+const { Option, Product, ProductOption, OptionGroup, Category } = require('../../models');
+const { Sequelize } = require('sequelize');
 
 // the `/api/options` and `/api/options/groups` endpoints
 
@@ -7,11 +8,12 @@ const { Option, ProductOption, OptionGroup } = require('../../models');
 // GET /api/options
 router.get('/', (req, res) => {
   Option.findAll({
-    attributes: ['id', 'option_name'],
-    include: [
-      ProductOption,
-      OptionGroup
-    ]
+    attributes: { exclude: ['option_group_id'] },
+    include: OptionGroup,
+    attributes: {
+      exclude: ['option_group_id'],
+      include: [[Sequelize.literal('(SELECT COUNT(*) FROM `product_option` INNER JOIN `Product` ON `product_option`.`product_id` = `Product`.`id` WHERE `product_option`.`option_id` = `Option`.`id`)'), 'product_count']]
+    },
   })
     .then(dbOptionData => res.json(dbOptionData))
     .catch(err => {
@@ -28,9 +30,8 @@ router.get('/groups', async (req, res) => {
       include: [
         {
           model: Option,
-          attributes: ['id', 'option_name']
-        },
-        ProductOption
+          attributes: { exclude: ['option_group_id'] }
+        }
       ]
     });
     if (!optionGroups) {
@@ -49,12 +50,12 @@ router.get('/groups', async (req, res) => {
 // GET /api/options/1
 router.get('/:id', (req, res) => {
   Option.findOne({
-    attributes: ['id', 'option_name'],
     where: { id: req.params.id },
-    include: [
-      ProductOption,
-      OptionGroup
-    ]
+    include: OptionGroup,
+    attributes: {
+      exclude: ['option_group_id'],
+      include: [[Sequelize.literal('(SELECT COUNT(*) FROM `product_option` INNER JOIN `Product` ON `product_option`.`product_id` = `Product`.`id` WHERE `product_option`.`option_id` = `Option`.`id`)'), 'product_count']]
+    },
   })
     .then(dbOptionData => res.json(dbOptionData))
     .catch(err => {
@@ -71,9 +72,8 @@ router.get('/groups/:id', (req, res) => {
     include: [
       {
         model: Option,
-        attributes: ['id', 'option_name']
-      },
-      ProductOption
+        attributes: { exclude: ['option_group_id'] }
+      }
     ]
   })
     .then(dbOptionGroupData => res.json(dbOptionGroupData))

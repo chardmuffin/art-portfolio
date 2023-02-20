@@ -17,7 +17,7 @@ OrderDetail.init(
       allowNull: false,
       references: {
         model: 'order',
-        key: 'id'
+        key: 'id',
       }
     },
     product_option_id: {

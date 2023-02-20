@@ -25,7 +25,7 @@ ProductOption.init(
       allowNull: false,
       references: {
         model: 'product',
-        key: 'id'
+        key: 'id',
       }
     },
     option_id: {

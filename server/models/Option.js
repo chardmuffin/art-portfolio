@@ -21,7 +21,7 @@ Option.init(
       type: DataTypes.INTEGER,
       references: {
         model: 'option_group',
-        key: 'id'
+        key: 'id',
       }
     }
   },

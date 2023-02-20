@@ -1,16 +1,24 @@
 const router = require('express').Router();
-const { Product, Category, Tag, ProductTag, ProductOption } = require('../../models');
+const { Product, Category, Option, OptionGroup, ProductOption } = require('../../models');
+const { Sequelize } = require('sequelize');
 
 // the `/api/products` endpoint
 
-// get all products (and associated category and productOptions)
+// get all products
 // GET /api/products
 router.get('/', (req, res) => {
   Product.findAll({
     include: [
       Category,
-      ProductOption
-    ]
+      {
+        model: ProductOption,
+        attributes: []
+      }
+    ],
+    attributes: {
+      exclude: ['category_id'],
+      include: [[Sequelize.literal('(SELECT COUNT(*) FROM product_option WHERE product_option.product_id = Product.id)'), 'product_option_count']]
+    }
   })
     .then(dbPostData => res.json(dbPostData))
     .catch(err => {
@@ -19,15 +27,46 @@ router.get('/', (req, res) => {
     });
 });
 
-// get one product by id (and associated category and productOptions)
+// get all product options
+// GET /api/products/options
+router.get('/options', (req, res) => {
+  ProductOption.findAll({
+    attributes: { exclude: ['product_id', 'option_id', 'option_group_id'] },
+    include: [
+      {
+        model: Product,
+        attributes: { exclude: ['category_id'] }
+      },
+      {
+        model: Option,
+        attributes: { exclude: ['option_group_id'] },
+        include: OptionGroup
+      }
+    ]
+  })
+    .then(dbProductOptionData => res.json(dbProductOptionData))
+    .catch(err => {
+      console.log(err);
+      res.status(500).json(err);
+    });
+});
+
+// get one product by id
 // GET /api/products/1
 router.get('/:id', (req, res) => {
   Product.findOne({
     where: { id: req.params.id },
     include: [
       Category,
-      ProductOption
-    ]
+      {
+        model: ProductOption,
+        attributes: []
+      }
+    ],
+    attributes: {
+      exclude: ['category_id'],
+      include: [[Sequelize.literal('(SELECT COUNT(*) FROM product_option WHERE product_option.product_id = Product.id)'), 'product_option_count']]
+    }
   })
     .then(dbProductData => {
       if (!dbProductData) {
@@ -41,6 +80,38 @@ router.get('/:id', (req, res) => {
     })
 });
 
+// get a single product option by id
+// GET /api/products/options/1
+// TODO
+router.get('/options/:id', (req, res) => {
+  ProductOption.findOne({
+    attributes: { exclude: ['product_id', 'option_id', 'option_group_id'] },
+    include: [
+      {
+        model: Product,
+        attributes: { exclude: ['category_id'] }
+      },
+      {
+        model: Option,
+        attributes: { exclude: ['option_group_id'] },
+        include: OptionGroup
+      }
+    ],
+    where: { id: req.params.id }
+  })
+    .then(dbProductOptionData => {
+      if (!dbProductOptionData) {
+        res.status(404).json({ message: 'Unable to find product option with this id' });
+        return;
+      }
+      res.json(dbProductOptionData);
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json(err);
+    });
+});
+
 // create new product
 // POST /api/products
 /* req.body should look like this...
@@ -48,7 +119,7 @@ router.get('/:id', (req, res) => {
     product_name: "Basketball",
     description: "A bouncy ball for shooting hoops.",            // optional
     price: 200.00, <------------------ this price is the default price (if no product options)           //optional
-    stock: 10,               // optional
+    stock: 10,                    // optional
     category_id: 1                // optional
   }
 */
@@ -59,13 +130,6 @@ router.post('/', (req, res) => {
       console.log(err);
       res.status(500).json(err);
     });
-});
-
-// bulk create new product options by product id and optionGroup id
-// POST /api/products/1/options/groups
-// TODO ?
-router.post('/:id/options/groups', (req, res) => {
-
 });
 
 // update product by id
@@ -103,11 +167,72 @@ router.delete('/:id', (req, res) => {
   })
 });
 
-// delete a single product option by id
-// DELETE /api/products/1/options/1
-// TODO
-router.delete('/:id/options/:id', (req, res) => {
+// ================================================ ProductOption Routes =======================================================
 
+// create a single product option
+// POST /api/products/options
+// expects {
+//   "option_price": 10.99,
+//   "stock": 20,
+//   "product_id": 1,
+//   "option_id": 1
+// }
+router.post('/options', (req, res) => {
+  ProductOption.create(req.body)
+    .then(dbProductOptionData => res.json(dbProductOptionData))
+    .catch(err => {
+      console.log(err);
+      res.status(500).json(err);
+    });
+});
+
+// update a single product option by id
+// PUT /api/products/options/1
+// expects {
+//   "option_price": 10.99,
+//   "stock": 20,
+//   "product_id": 1,
+//   "option_id": 1
+// }
+router.put('/options/:id', (req, res) => {
+  ProductOption.update(req.body, {
+    where: {
+      id: req.params.id
+    }
+  })
+    .then(dbProductOptionData => {
+      if (!dbProductOptionData[0]) {
+        res.status(404).json({ message: 'Unable to find product option with this id' });
+        return;
+      }
+      res.json(dbProductOptionData);
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json(err);
+    });
+});
+
+// delete a single product option by id
+// DELETE /api/products/options/1
+// TODO
+router.delete('/options/:id', (req, res) => {
+  ProductOption.destroy({
+    where: {
+      id: req.params.id
+    }
+  })
+    .then(dbProductOptionData => {
+      if (!dbProductOptionData) {
+        res.status(404).json({ message: 'Unable to find product option with this id' });
+        return;
+      }
+      res.json(dbProductOptionData);
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json(err);
+    });
 });
 
 module.exports = router;

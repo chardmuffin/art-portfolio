@@ -53,16 +53,26 @@ OptionGroup.hasMany(Option, {
   onDelete: 'CASCADE'
 });
 
-// Options and Products
+// Options, OptionGroups, and Products
 Option.belongsToMany(Product, {
   through: ProductOption,
   as: 'product_with_option',
   foreignKey: 'option_id'
 });
 
+OptionGroup.belongsToMany(Product, {
+  through: ProductOption,
+  foreignKey: 'option_group_id'
+});
+
 Product.belongsToMany(Option, {
   through: ProductOption,
   as: 'product_with_option',
+  foreignKey: 'product_id'
+});
+
+Product.belongsToMany(OptionGroup, {
+  through: ProductOption,
   foreignKey: 'product_id'
 });
 

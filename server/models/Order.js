@@ -3,7 +3,7 @@ const sequelize = require('../config/connection');
 
 class Order extends Model {}
 
-// Order contains several OrderDetail
+// Order has many OrderDetail
 Order.init(
   {
     id: {
@@ -16,7 +16,7 @@ Order.init(
       type: DataTypes.INTEGER,
       references: {
         model: 'user',
-        key: 'id'
+        key: 'id',
       }
     },
     status: {
@@ -28,6 +28,8 @@ Order.init(
       type: DataTypes.DECIMAL,
       allowNull: false
     },
+
+    // TODO make a distinct model for addresses
     address: {
       type: DataTypes.STRING,
       allowNull: false

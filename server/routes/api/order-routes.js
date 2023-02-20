@@ -38,6 +38,13 @@ router.get('/:id', (req, res) => {
 
 // TODO create new order with order details
 // POST /api/orders
+/* req.body should look like this...
+  {
+    status: 
+    total: 
+    address:
+  }
+*/
 router.post('/', (req, res) => {
 
 });
