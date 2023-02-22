@@ -54,6 +54,7 @@ OptionGroup.hasMany(Option, {
 });
 
 // Options, OptionGroups, and Products
+// ProductOption through table
 Option.belongsToMany(Product, {
   through: ProductOption,
   as: 'product_with_option',
@@ -76,7 +77,7 @@ Product.belongsToMany(OptionGroup, {
   foreignKey: 'product_id'
 });
 
-// Orders, Users, and Order Items
+// Orders, Users, and Order Details
 User.hasMany(Order, {
   foreignKey: 'user_id'
 });
