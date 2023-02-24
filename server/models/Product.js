@@ -6,7 +6,7 @@ class Product extends Model {}
 // each product is a family
 // e.g product "smiley face t-shirt" includes:
 // smiley face t-shirt small, smiley face t-shirt medium, smiley face t-shirt large, etc.
-// product has a base price that is altered based on productOption's option_price_multiplier
+// product has a base price that is overwritten by the product_option's price
 // stock will be the stock of all associated productOption added together
 Product.init(
   {
@@ -16,7 +16,7 @@ Product.init(
       primaryKey: true,
       autoIncrement: true
     },
-    product_name: {
+    name: {
       type: DataTypes.STRING,
       allowNull: false
     },

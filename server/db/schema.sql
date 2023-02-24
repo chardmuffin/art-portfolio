@@ -1,3 +1,3 @@
-DROP DATABASE IF EXISTS art_portfolio_db;
+DROP DATABASE IF EXISTS ap_db;
 
-CREATE DATABASE art_portfolio_db;
+CREATE DATABASE ap_db;

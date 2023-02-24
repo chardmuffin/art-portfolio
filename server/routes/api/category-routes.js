@@ -9,7 +9,7 @@ const { Sequelize } = require('sequelize');
 router.get('/', async (req, res) => {
   Category.findAll({
     attributes: [
-      'category_name',
+      'name',
       [Sequelize.literal('(SELECT COUNT(*) FROM product WHERE product.category_id = Category.id)'), 'product_count']
     ]
   })
@@ -26,7 +26,7 @@ router.get('/:id', (req, res) => {
   Category.findOne({
     where: { id: req.params.id },
     attributes: [
-      'category_name',
+      'name',
       [Sequelize.literal('(SELECT COUNT(*) FROM product WHERE product.category_id = Category.id)'), 'product_count']
     ]
   })
@@ -39,7 +39,7 @@ router.get('/:id', (req, res) => {
 
 // create a new category
 // POST /api/categories
-// expects {category_name: "Books"}
+// expects {name: "Books"}
 router.post('/', (req, res) => {
   Category.create(req.body)
     .then(dbCategoryData => res.json(dbCategoryData))
@@ -51,7 +51,7 @@ router.post('/', (req, res) => {
 
 // update a category by its `id` value
 // PUT /api/categories/1
-// expects {category_name: "Books"}
+// expects {name: "Books"}
 router.put('/:id', (req, res) => {
   Category.update(req.body, {
     where: { id: req.params.id }

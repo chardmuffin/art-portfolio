@@ -82,10 +82,10 @@ router.get('/:id', (req, res) => {
 
 // get a single product option by id
 // GET /api/products/options/1
-// TODO
 router.get('/options/:id', (req, res) => {
   ProductOption.findOne({
     attributes: { exclude: ['product_id', 'option_id', 'option_group_id'] },
+    where: { id: req.params.id },
     include: [
       {
         model: Product,
@@ -96,8 +96,7 @@ router.get('/options/:id', (req, res) => {
         attributes: { exclude: ['option_group_id'] },
         include: OptionGroup
       }
-    ],
-    where: { id: req.params.id }
+    ]
   })
     .then(dbProductOptionData => {
       if (!dbProductOptionData) {
@@ -116,7 +115,7 @@ router.get('/options/:id', (req, res) => {
 // POST /api/products
 /* req.body should look like this...
   {
-    product_name: "Basketball",
+    name: "Basketball",
     description: "A bouncy ball for shooting hoops.",            // optional
     price: 200.00, <------------------ this price is the default price (if no product options)           //optional
     stock: 10,                    // optional

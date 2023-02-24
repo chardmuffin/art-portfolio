@@ -12,9 +12,9 @@ ProductOption.init(
       primaryKey: true,
       autoIncrement: true
     },
-    option_price: {
+    price_difference: {
       type: DataTypes.DECIMAL,
-      allowNull: false
+      allowNull: true
     },
     stock: {
       type: DataTypes.INTEGER,
@@ -43,6 +43,7 @@ ProductOption.init(
     freezeTableName: true,
     underscored: true,
     modelName: 'product_option',
+    indexes: [{ unique: true, fields: ['product_id', 'option_id'] }]
   }
 );
 

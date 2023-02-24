@@ -13,7 +13,7 @@ OptionGroup.init(
       primaryKey: true,
       autoIncrement: true
     },
-    option_group_name: {
+    name: {
       type: DataTypes.STRING,
       allowNull: false,
       unique: true

@@ -9,11 +9,31 @@ const OptionGroup = require('./OptionGroup');
 
 // Categories and Products
 Category.hasMany(Product, {
-  foreignKey: 'category_id'
+  foreignKey: 'category_id',
+  onDelete: 'CASCADE'
 });
 
 Product.belongsTo(Category, {
   foreignKey: 'category_id'
+});
+
+// Options, Option Groups, and Product Options
+OptionGroup.hasMany(Option, {
+  foreignKey: 'option_group_id',
+  onDelete: 'CASCADE'
+});
+
+Option.belongsTo(OptionGroup, {
+  foreignKey: 'option_group_id'
+});
+
+ProductOption.belongsTo(Option, {
+  foreignKey: 'option_id'
+});
+
+Option.hasMany(ProductOption, {
+  foreignKey: 'option_id',
+  onDelete: 'CASCADE'
 });
 
 // Products and Product Options
@@ -23,57 +43,6 @@ Product.hasMany(ProductOption, {
 });
 
 ProductOption.belongsTo(Product, {
-  foreignKey: 'product_id'
-});
-
-// Product Options, Options, and Option Groups
-ProductOption.belongsTo(Option, {
-  foreignKey: 'option_id'
-});
-
-Option.hasMany(ProductOption, {
-  foreignKey: 'option_id'
-});
-
-ProductOption.belongsTo(OptionGroup, {
-  foreignKey: 'option_group_id'
-});
-
-OptionGroup.hasMany(ProductOption, {
-  foreignKey: 'option_group_id'
-})
-
-Option.belongsTo(OptionGroup, {
-  foreignKey: 'option_group_id',
-  onDelete: 'CASCADE'
-});
-
-OptionGroup.hasMany(Option, {
-  foreignKey: 'option_group_id',
-  onDelete: 'CASCADE'
-});
-
-// Options, OptionGroups, and Products
-// ProductOption through table
-Option.belongsToMany(Product, {
-  through: ProductOption,
-  as: 'product_with_option',
-  foreignKey: 'option_id'
-});
-
-OptionGroup.belongsToMany(Product, {
-  through: ProductOption,
-  foreignKey: 'option_group_id'
-});
-
-Product.belongsToMany(Option, {
-  through: ProductOption,
-  as: 'product_with_option',
-  foreignKey: 'product_id'
-});
-
-Product.belongsToMany(OptionGroup, {
-  through: ProductOption,
   foreignKey: 'product_id'
 });
 

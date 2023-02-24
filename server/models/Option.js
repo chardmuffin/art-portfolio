@@ -13,7 +13,7 @@ Option.init(
       primaryKey: true,
       autoIncrement: true
     },
-    option_name: {
+    name: {
       type: DataTypes.STRING,
       allowNull: false
     },
@@ -31,12 +31,6 @@ Option.init(
     freezeTableName: true,
     underscored: true,
     modelName: 'option',
-    indexes: [
-      {
-        unique: true,
-        fields: ['option_name', 'option_group_id']
-      }
-    ]
   }
 );
 

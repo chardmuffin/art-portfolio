@@ -85,7 +85,7 @@ router.get('/groups/:id', (req, res) => {
 
 // create a new option
 // POST /api/options
-// expects {option_name: "Small", option_group_id: 1}
+// expects {name: "Small", option_group_id: 1}
 router.post('/', (req, res) => {
   Option.create(req.body)
     .then(dbOptionData => res.json(dbOptionData))
@@ -99,7 +99,7 @@ router.post('/', (req, res) => {
 // POST /api/options/groups
 // expects
 //   {
-//     option_group_name: "T-Shirt sizes"
+//     name: "T-Shirt sizes"
 //   }
 router.post('/groups', (req, res) => {
   OptionGroup.create(req.body)
@@ -112,7 +112,7 @@ router.post('/groups', (req, res) => {
 
 // update option by id
 // PUT /api/options/1
-// expects {option_name: "Small", option_group_id: 1}
+// expects {name: "Small", option_group_id: 1}
 router.put('/:id', (req, res) => {
   Option.update(
     req.body,
@@ -134,7 +134,7 @@ router.put('/:id', (req, res) => {
 // PUT /api/options/groups/1
 // expects
 //   {
-//     option_group_name: "T-Shirt sizes"
+//     name: "T-Shirt sizes"
 //   }
 router.put('/groups/:id', (req, res) => {
   OptionGroup.update(req.body, {
