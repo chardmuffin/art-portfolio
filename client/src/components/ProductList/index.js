@@ -13,7 +13,7 @@ const ProductList = ({ products, title }) => {
         products.map(product => (
           <div key={product.id} className="card">
             <div className="card-header">
-              {product.product_name}
+              {product.name}
               {toMoneyFormat(product.price)}
             </div>
             <div className="card-body">
