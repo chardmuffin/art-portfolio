@@ -1,5 +1,3 @@
-import logo from './logo.svg';
-import './App.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import Header from './components/Header';
@@ -10,6 +8,8 @@ import Login from './pages/Login';
 import NoMatch from './pages/NoMatch';
 import Profile from './pages/Profile';
 import Signup from './pages/Signup';
+import Search from './pages/Search';
+import Checkout from './pages/Checkout';
 
 function App() {
   return (
@@ -20,6 +20,8 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/search" element={<Search />} />
+        <Route path="/checkout" element={<Checkout />} />
         <Route path="*" element={<NoMatch />} />
       </Routes>
       <Footer />
