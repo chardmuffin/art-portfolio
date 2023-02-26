@@ -21,7 +21,6 @@ const Home = () => {
 
   return (
     <main>
-      Home
       <ProductList
         products={data}
         title="Original artwork for purchase"
