@@ -24,10 +24,6 @@ const Header = (props) => {
 
   };
 
-  // <Link to="/"><h1>Home</h1></Link>
-  // <Link to="/search">Search</Link>
-  // <Link to="/checkout">Cart</Link>
-
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
@@ -127,9 +123,10 @@ const Header = (props) => {
           {drawer}
         </Drawer>
       </Box>
+
+      {/* space the height of header before content */}
       <Box sx={{ p: 3 }}>
         <Toolbar />
-        
       </Box>
     </Box>
   );

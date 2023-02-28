@@ -1,6 +1,9 @@
 const router = require('express').Router();
-const { Product, Category, Option, OptionGroup, ProductOption } = require('../../models');
+const { Product, Category, Option, OptionGroup, ProductOption, Image } = require('../../models');
 const { Sequelize } = require('sequelize');
+const sharp = require('sharp');
+const fs = require('fs');
+const path = require('path');
 
 // the `/api/products` endpoint
 
@@ -10,6 +13,10 @@ router.get('/', (req, res) => {
   Product.findAll({
     include: [
       Category,
+      {
+        model: Image,
+        attributes: { exclude: ['data', 'product_id'] }
+      },
       {
         model: ProductOption,
         attributes: []
@@ -51,6 +58,24 @@ router.get('/options', (req, res) => {
     });
 });
 
+// get all product images
+// GET /api/products/images
+// not used in production
+router.get('/images', (req, res) => {
+  Image.findAll({
+    attributes: { exclude: ['data', 'product_id'] },
+    include: {
+      model: Product,
+      attributes: { exclude: ['category_id'] }
+    }
+  })
+    .then(dbImageData => res.json(dbImageData))
+    .catch(err => {
+      console.log(err);
+      res.status(500).json(err);
+    });
+});
+
 // get one product by id
 // GET /api/products/1
 router.get('/:id', (req, res) => {
@@ -58,6 +83,10 @@ router.get('/:id', (req, res) => {
     where: { id: req.params.id },
     include: [
       Category,
+      {
+        model: Image,
+        attributes: { exclude: ['data', 'product_id'] }
+      },
       {
         model: ProductOption,
         attributes: []
@@ -111,16 +140,47 @@ router.get('/options/:id', (req, res) => {
     });
 });
 
+// get a single image by id (returns the actual buffer image, not the BLOB data)
+// GET /api/products/images/1
+router.get('/images/:id', (req, res) => {
+  const { id } = req.params;
+  const width = req.query.width ? parseInt(req.query.width, 10) : undefined;
+  const height = req.query.height ? parseInt(req.query.height, 10) : undefined;
+
+  Image.findByPk(id)
+    .then(dbImageData => {
+      if (!dbImageData) {
+        res.status(404).json({ message: 'Unable to find image with this id' });
+        return;
+      }
+
+      //apply max width and/or height and send resized image
+      const pipeline = sharp(dbImageData.data);
+      if (width || height) {
+        pipeline.resize(width, height);
+      }
+
+      pipeline.toBuffer((err, data, info) => {
+        res.set('Content-Type', 'image/jpeg');
+        res.send(data);
+      });
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json(err);
+    });
+});
+
 // create new product
 // POST /api/products
 /* req.body should look like this...
   {
     name: "Basketball",
-    description: "A bouncy ball for shooting hoops.",            // optional
-    price: 200.00, <------------------ this price is the default price (if no product options)           //optional
-    stock: 10,                    // optional
-    category_id: 1                // optional
-  }
+    description: "A bouncy ball for shooting hoops.",                                         // optional
+    price: 200.00, <---- this price is the (required) default price (if no product options)
+    stock: 10,                                                                                // optional
+    category_id: 1                                                                            // optional
+  }   
 */
 router.post('/', (req, res) => {
   Product.create(req.body)
@@ -133,6 +193,16 @@ router.post('/', (req, res) => {
 
 // update product by id
 // PUT /api/products/1
+/* req.body should resemble this...
+  {
+    name: "Basketball",
+    description: "A bouncy ball for shooting hoops.",                                         // optional
+    price: 200.00, <---- this price is the (required) default price (if no product options)
+    stock: 10,                                                                                // optional
+    category_id: 1                                                                            // optional
+    image_id: 1                                                                               // optional
+  }   
+*/
 router.put('/:id', (req, res) => {
   // update product data
   Product.update(req.body, {
@@ -147,7 +217,7 @@ router.put('/:id', (req, res) => {
     });
 });
 
-// delete product by id, and associated product options
+// delete product by id, and associated product options and image
 // DELETE /api/products/1
 router.delete('/:id', (req, res) => {
   Product.destroy({
@@ -214,7 +284,6 @@ router.put('/options/:id', (req, res) => {
 
 // delete a single product option by id
 // DELETE /api/products/options/1
-// TODO
 router.delete('/options/:id', (req, res) => {
   ProductOption.destroy({
     where: {
@@ -227,6 +296,107 @@ router.delete('/options/:id', (req, res) => {
         return;
       }
       res.json(dbProductOptionData);
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json(err);
+    });
+});
+
+// ================================================ Product Image Routes =======================================================
+
+// create a single product image
+// POST /api/products/images
+// expects {
+//   "filename": 'artie.jpg',   // required:
+//                              // a large, compressed image in jpg format. e.g dimensions 3000w x 4000h and 500KB.
+//   "product_id": 1
+// }
+router.post('/images', (req, res) => {
+  const { filename, product_id } = req.body;
+
+  if (!filename) {
+    res.status(400).json({ message: 'Filename is required' });
+    return;
+  }
+
+  // Read the image file from local folder
+  const imagePath = path.join(__dirname, '../../../client/src/assets/images/products', filename);
+
+  sharp(imagePath)
+    .toBuffer((err, data) => {
+      if (err) {
+        console.log(err);
+        res.status(500).json(err);
+        return;
+      }
+
+      //console.log(data.byteLength)
+
+      // Create the Image object with the buffer data
+      Image.create({ filename, data, product_id })
+        .then(dbImageData => res.json(dbImageData))
+        .catch(err => {
+          console.log(err);
+          res.status(500).json(err);
+        });
+    });
+});
+
+// update a single product image by id
+// PUT /api/products/images/1
+// expects {
+//   "filename": 'artie.jpg'   // optional
+//   "product_id": 1           // optional
+// }
+router.put('/images/:id', async (req, res) => {
+  const { id } = req.params;
+  const { filename, product_id } = req.body;
+  try {
+    const dbImageData = await Image.findByPk(id);
+    if (!dbImageData) {
+      res.status(404).json({ message: 'Unable to find product image with this id' });
+      return;
+    }
+
+    if (filename) {
+      dbImageData.filename = filename;
+    }
+    if (product_id) {
+      dbImageData.product_id = product_id;
+    }
+
+    // update data based on filename
+    const imagePath = path.join(__dirname, '../../../client/src/assets/images/products/', dbImageData.filename);
+    let data = await fs.promises.readFile(imagePath);
+
+    // store image data as BLOB using sharp
+    data = await sharp(data).toBuffer();
+    dbImageData.data = data;
+
+    await dbImageData.save();
+
+    res.json(dbImageData);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json(err);
+  }
+});
+
+// delete a single product image by id
+// DELETE /api/products/images/1
+router.delete('/images/:id', (req, res) => {
+  Image.destroy({
+    where: {
+      id: req.params.id
+    }
+  })
+    .then(dbImageData => {
+      if (!dbImageData) {
+        res.status(404).json({ message: 'Unable to find product image with this id' });
+        return;
+      }
+      res.json(dbImageData);
     })
     .catch(err => {
       console.log(err);

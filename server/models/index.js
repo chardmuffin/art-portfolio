@@ -6,6 +6,17 @@ const Category = require('./Category');
 const ProductOption = require('./ProductOption');
 const Option = require('./Option');
 const OptionGroup = require('./OptionGroup');
+const Image = require('./Image');
+
+// Products and Images
+Product.hasOne(Image, {
+  foreignKey: 'product_id',
+  onDelete: 'CASCADE'
+});
+
+Image.belongsTo(Product, {
+  foreignKey: 'product_id'
+});
 
 // Categories and Products
 Category.hasMany(Product, {
@@ -77,6 +88,7 @@ module.exports = {
   Order,
   OrderDetail,
   Product,
+  Image,
   Category,
   ProductOption,
   Option,

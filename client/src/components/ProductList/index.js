@@ -1,5 +1,8 @@
 import React from 'react';
-import { toMoneyFormat } from '../../utils/helpers';
+import {
+  ImageList,
+  ImageListItem
+} from '@mui/material';
 
 const ProductList = ({ products, title }) => {
   if (!products.length) {
@@ -7,21 +10,25 @@ const ProductList = ({ products, title }) => {
   }
 
   return (
-    <div>
+    <>
       <h3>{title}</h3>
-      {products &&
-        products.map(product => (
-          <div key={product.id} className="card">
-            <div className="card-header">
-              {product.name}
-              {toMoneyFormat(product.price)}
-            </div>
-            <div className="card-body">
-              <p>{product.description}</p>
-            </div>
-          </div>
-        ))}
-    </div>
+      <ImageList variant="masonry" cols={3} gap={8}>
+        {products &&
+          products.map((product) => {
+            return (
+              <ImageListItem key={product.id}>
+                <img
+                  src={`${product.img}?w=248&fit=crop&auto=format`}
+                  srcSet={`${product.img}?w=248&fit=crop&auto=format&dpr=2 2x`}
+                  alt={product.name}
+                  loading="lazy"
+                />
+              </ImageListItem>
+            )
+          }
+        )}
+      </ImageList>
+    </>
   );
 };
 

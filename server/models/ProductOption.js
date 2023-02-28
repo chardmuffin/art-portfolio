@@ -20,6 +20,10 @@ ProductOption.init(
       type: DataTypes.INTEGER,
       allowNull: false
     },
+    img: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
     product_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
