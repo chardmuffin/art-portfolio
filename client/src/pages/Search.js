@@ -3,6 +3,7 @@ import ProductList from '../components/ProductList';
 import axios from 'axios';
 import { useQuery } from 'react-query';
 import {
+  Container,
   InputLabel,
   TextField,
   Checkbox,
@@ -58,7 +59,8 @@ const Search = () => {
   const categories = ['All', ...new Set(data?.map((product) => product.category.name))];
 
   return (
-    <main>
+    <Container>
+      <h3>Search Portfolio</h3>
       <FormControl fullWidth>
         <TextField
           value={filters.text}
@@ -70,7 +72,7 @@ const Search = () => {
           }}
         />
       </FormControl>
-      <FormGroup>
+      <FormGroup sx={{ my: 1 }}>
         <FormControl variant="outlined">
         <InputLabel id="category-label">Category</InputLabel>
           <Select
@@ -90,12 +92,12 @@ const Search = () => {
           label="Only show products in stock"
           control={
             <Checkbox
-              defaultChecked
               onChange={(e) => handleFilterChange('inStockOnly', e.target.checked)}
             />
           }
+          sx={{ my: 2 }}
         />
-        <InputLabel>Price Range</InputLabel>
+        <InputLabel sx={{ mt: 1 }}>Price Range</InputLabel>
         <Slider
           value={filters.priceRange}
           onChange={(e, newValue) => {
@@ -105,12 +107,13 @@ const Search = () => {
           min={0}
           max={500}
           step={10}
+          sx={{maxWidth: '90%', mx: 'auto', mb: 2}}
         />
       </FormGroup>
       {isLoading && <div>Loading...</div>}
       {isError && <div>Error: {error?.message ?? 'Unknown error'}</div>}
       {data && <ProductList products={filteredProducts} title="Results" />}
-    </main>
+    </Container>
   );
 };
 

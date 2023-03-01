@@ -2,6 +2,7 @@ import React from 'react';
 import ProductList from '../components/ProductList';
 import axios from 'axios';
 import { useQuery } from 'react-query';
+import { Container } from '@mui/material';
 
 const Home = () => {
   const { isLoading, isError, data, error } = useQuery('products', () =>
@@ -11,21 +12,12 @@ const Home = () => {
       .then((response) => response.data)
   );
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  if (isError) {
-    return <div>Error: { error?.message ?? 'Unknown error' }</div>;
-  }
-
   return (
-    <main>
-      <ProductList
-        products={data}
-        title="Original artwork for purchase"
-      />
-    </main>
+    <Container>
+      {isLoading && <div>Loading...</div>}
+      {isError && <div>Error: {error?.message ?? 'Unknown error'}</div>}
+      {data && <ProductList products={data} title="Original artwork for purchase" />}
+    </Container>
   );
 };
 
