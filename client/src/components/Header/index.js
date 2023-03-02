@@ -14,7 +14,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-import ShoppingCartOutlined from '@mui/icons-material/ShoppingCartOutlined'
+import ShoppingCartOutlined from '@mui/icons-material/ShoppingCartOutlined';
 
 const drawerWidth = 240;
 
@@ -57,32 +57,28 @@ const Header = (props) => {
     </Box>
   );
 
+  // for drawer
   const container = window !== undefined ? () => window().document.body : undefined;
 
   return (
     <Box sx={{ display: 'flex' }}>
-      <CssBaseline />
-      <AppBar component="nav">
+
+      {/* bottom bar (mobile) */}
+      <AppBar position="fixed" color="primary" sx={{ top: 'auto', bottom: 0, display: { sm: 'none'} }}>
         <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { sm: 'none' } }}
-          >
+          <IconButton color="inherit" aria-label="open drawer" onClick={handleDrawerToggle}>
             <MenuIcon />
           </IconButton>
-          <Box sx={{ marginLeft: 'auto' }}>
-            <IconButton
-              component={Link}
-              to={'/checkout'}
-              color="inherit"
-              sx={{ mr: 2, display: { sm: 'none' }, marginRight: 0 }}
-            >
-              <ShoppingCartOutlined />
-            </IconButton> 
-          </Box>
+          <Box sx={{ flexGrow: 1 }} />
+          <IconButton component={Link} to={'/checkout'} color="inherit">
+            <ShoppingCartOutlined />
+          </IconButton>
+        </Toolbar>
+      </AppBar>
+
+      {/* top bar (tablet/desktop) */}
+      <AppBar component="nav" color="primary" sx={{ display: { xs: 'none', sm: 'block' } }}>
+        <Toolbar>
           <Typography
             variant="h6"
             component="div"
@@ -91,21 +87,23 @@ const Header = (props) => {
             Original Paintings
           </Typography>
           <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-            <Button component={Link} to={'/'} sx={{ color: '#fff' }}>
+            <Button component={Link} to={'/'} color="inherit">
               Browse
             </Button>
-            <Button component={Link} to={'/search'} sx={{ color: '#fff' }}>
+            <Button component={Link} to={'/search'} color="inherit">
               Search
             </Button>
-            <Button component={Link} to={'/about'} sx={{ color: '#fff' }}>
+            <Button component={Link} to={'/about'} color="inherit">
               About
             </Button>
-            <IconButton component={Link} to={'/checkout'} sx={{ color: '#fff' }}>
+            <IconButton component={Link} to={'/checkout'} color="inherit">
               <ShoppingCartOutlined />
             </IconButton>
           </Box>
         </Toolbar>
       </AppBar>
+
+      {/* drawer (mobile) */}
       <Box component="nav">
         <Drawer
           container={container}
@@ -124,8 +122,8 @@ const Header = (props) => {
         </Drawer>
       </Box>
 
-      {/* space the height of header before content */}
-      <Box sx={{ p: 3 }}>
+      {/* space the height of header before content (desktop) */}
+      <Box sx={{ p: 3, display: { xs: 'none', sm: 'block' } }}>
         <Toolbar />
       </Box>
     </Box>
