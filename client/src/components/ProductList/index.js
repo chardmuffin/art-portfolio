@@ -3,18 +3,20 @@ import {
   Box,
   useMediaQuery,
   ImageList,
-  ImageListItem
+  ImageListItem,
+  Typography
 } from '@mui/material';
 
 const ProductList = ({ products, title }) => {
 
-  const smallScreen = useMediaQuery('(max-width: 960px)');
-  const cols = smallScreen ? 1 : 2;
-  const width = smallScreen ? 300 : 500;
+  const smallScreen = useMediaQuery('(max-width: 600px)');
+  const mediumScreen = useMediaQuery('(max-width: 960px)');
+  const cols = smallScreen ? 1 : (mediumScreen ? 2 : 3);
+  const width = smallScreen ? 300 : (mediumScreen ? 370 : 325);
 
   return (
-    <Box sx={{ width: '90%', mx: 'auto' }}>
-      <h3>{title}</h3>
+    <Box sx={{ mx: 'auto', my: 2 }}>
+      <Typography variant='h6'>{title}</Typography>
         <ImageList variant="masonry" cols={cols} gap={30}>
           {products &&
             products.map((product) => (

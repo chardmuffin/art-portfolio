@@ -12,3 +12,7 @@ export function toMoneyFormat (value) {
   });
   return formatter.format(value);
 };
+
+export function capitalizeFirstLetter(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+};

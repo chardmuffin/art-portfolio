@@ -1,8 +1,7 @@
-import React from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
-import CssBaseline from '@mui/material/CssBaseline';
 import Divider from '@mui/material/Divider';
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
@@ -16,6 +15,9 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import ShoppingCartOutlined from '@mui/icons-material/ShoppingCartOutlined';
 
+import DarkModeSwitch from '../DarkModeSwitch';
+
+
 const drawerWidth = 240;
 
 const Header = (props) => {
@@ -25,36 +27,53 @@ const Header = (props) => {
   };
 
   const { window } = props;
-  const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const handleDrawerToggle = () => {
     setMobileOpen((prevState) => !prevState);
   };
 
   const drawer = (
-    <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center' }}>
-      <Typography variant="h6" sx={{ my: 2 }}>
-        Original Paintings
-      </Typography>
+    <>
+      <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center' }}>
+        <Typography variant="h6" sx={{ my: 2 }}>
+          Original Paintings
+        </Typography>
+        <Divider />
+        <List>
+          <ListItem disablePadding>
+            <ListItemButton component={Link} to={'/'} sx={{ textAlign: 'center' }}>
+              <ListItemText primary={'Browse'} />
+            </ListItemButton>
+          </ListItem>
+          <ListItem disablePadding>
+            <ListItemButton component={Link} to={'/search'} sx={{ textAlign: 'center' }}>
+              <ListItemText primary={'Search'} />
+            </ListItemButton>
+          </ListItem>
+          <ListItem disablePadding>
+            <ListItemButton component={Link} to={'/about'} sx={{ textAlign: 'center' }}>
+              <ListItemText primary={'About'} />
+            </ListItemButton>
+          </ListItem>
+        </List>
+      </Box>
       <Divider />
-      <List>
-        <ListItem disablePadding>
-          <ListItemButton component={Link} to={'/'} sx={{ textAlign: 'center' }}>
-            <ListItemText primary={'Browse'} />
-          </ListItemButton>
-        </ListItem>
-        <ListItem disablePadding>
-          <ListItemButton component={Link} to={'/search'} sx={{ textAlign: 'center' }}>
-            <ListItemText primary={'Search'} />
-          </ListItemButton>
-        </ListItem>
-        <ListItem disablePadding>
-          <ListItemButton component={Link} to={'/about'} sx={{ textAlign: 'center' }}>
-            <ListItemText primary={'About'} />
-          </ListItemButton>
-        </ListItem>
-      </List>
-    </Box>
+      <Box sx={{ flexGrow: 1 }}/>
+      <Box
+        sx={{
+          display: 'flex',
+          width: '100%',
+          justifyContent: 'center',
+          borderRadius: 1,
+          p: 3
+        }}
+      >
+        <DarkModeSwitch
+          ColorModeContext={props.ColorModeContext}
+        />
+      </Box>
+    </>
   );
 
   // for drawer
@@ -80,8 +99,8 @@ const Header = (props) => {
       <AppBar component="nav" color="primary" sx={{ display: { xs: 'none', sm: 'block' } }}>
         <Toolbar>
           <Typography
-            variant="h6"
-            component="div"
+            variant="h4"
+            component="h1"
             sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
           >
             Original Paintings
@@ -122,10 +141,14 @@ const Header = (props) => {
         </Drawer>
       </Box>
 
-      {/* space the height of header before content (desktop) */}
-      <Box sx={{ p: 3, display: { xs: 'none', sm: 'block' } }}>
+      {/* space the height of header before content and dark mode switch (desktop) */}
+      <Box sx={{ pb: 3, display: { xs: 'none', sm: 'block' }, ml: 'auto' }}>
         <Toolbar />
+        <DarkModeSwitch
+          ColorModeContext={props.ColorModeContext}
+        />
       </Box>
+
     </Box>
   );
 };

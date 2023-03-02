@@ -1,7 +1,8 @@
-import { useMemo } from 'react';
+import { useMemo, useState, createContext } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
+import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
 
 import Header from './components/Header';
@@ -17,41 +18,55 @@ import Search from './pages/Search';
 import Checkout from './pages/Checkout';
 import About from './pages/About';
 
-function App() {
+const ColorModeContext = createContext({ toggleColorMode: () => {} });
 
-  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+function App() {
+  const [mode, setMode] = useState(useMediaQuery('(prefers-color-scheme: dark)') ? 'dark' : 'light');
+  const colorMode = useMemo(() => ({
+      toggleColorMode: () => {
+        setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
+      },
+    }),
+    [],
+  );
 
   const theme = useMemo(() =>
       createTheme({
         palette: {
-          mode: prefersDarkMode ? 'dark' : 'light',
+          mode,
         },
       }),
-    [prefersDarkMode],
+    [mode],
   );
 
   return (
     <Router>
       <ScrollToTop />
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
+      <ColorModeContext.Provider value={colorMode}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
 
-        <Header />
+          <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+            <Box sx={{ flex: 1 }}>
+              <Header ColorModeContext={ColorModeContext}/>
 
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/search" element={<Search />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="*" element={<NoMatch />} />
-        </Routes>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/search" element={<Search />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/checkout" element={<Checkout />} />
+                <Route path="*" element={<NoMatch />} />
+              </Routes>
+            </Box>
+            
+            <Footer />
+          </Box>
 
-        <Footer />
-
-      </ThemeProvider>
+        </ThemeProvider>
+      </ColorModeContext.Provider>
     </Router>
   );
 }
