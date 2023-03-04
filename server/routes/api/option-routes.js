@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const { Option, Product, ProductOption, OptionGroup, Category } = require('../../models');
 const { Sequelize } = require('sequelize');
+const withAuth = require('../../utils/auth');
 
 // the `/api/options` and `/api/options/groups` endpoints
 
@@ -86,7 +87,7 @@ router.get('/groups/:id', (req, res) => {
 // create a new option
 // POST /api/options
 // expects {name: "Small", option_group_id: 1}
-router.post('/', (req, res) => {
+router.post('/', withAuth, (req, res) => {
   Option.create(req.body)
     .then(dbOptionData => res.json(dbOptionData))
     .catch(err => {
@@ -101,7 +102,7 @@ router.post('/', (req, res) => {
 //   {
 //     name: "T-Shirt sizes"
 //   }
-router.post('/groups', (req, res) => {
+router.post('/groups', withAuth, (req, res) => {
   OptionGroup.create(req.body)
     .then(dbOptionGroupData => res.json(dbOptionGroupData))
     .catch(err => {
@@ -113,7 +114,7 @@ router.post('/groups', (req, res) => {
 // update option by id
 // PUT /api/options/1
 // expects {name: "Small", option_group_id: 1}
-router.put('/:id', (req, res) => {
+router.put('/:id', withAuth, (req, res) => {
   Option.update(
     req.body,
     { where: { id: req.params.id } })
@@ -136,7 +137,7 @@ router.put('/:id', (req, res) => {
 //   {
 //     name: "T-Shirt sizes"
 //   }
-router.put('/groups/:id', (req, res) => {
+router.put('/groups/:id', withAuth, (req, res) => {
   OptionGroup.update(req.body, {
     where: {
       id: req.params.id
@@ -157,7 +158,7 @@ router.put('/groups/:id', (req, res) => {
 
 // delete option by id
 // DELETE /api/options/1
-router.delete('/:id', (req, res) => {
+router.delete('/:id', withAuth, (req, res) => {
   Option.destroy({ where: { id: req.params.id } })
     .then(dbOptionData => {
       if (!dbOptionData) {
@@ -174,7 +175,7 @@ router.delete('/:id', (req, res) => {
 
 // delete option group by id
 // DELETE /api/options/groups/1
-router.delete('/groups/:id', (req, res) => {
+router.delete('/groups/:id', withAuth, (req, res) => {
   OptionGroup.destroy({ where: { id: req.params.id } })
     .then(dbOptionGroupData => {
       if (!dbOptionGroupData) {

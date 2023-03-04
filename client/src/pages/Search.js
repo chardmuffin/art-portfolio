@@ -59,7 +59,7 @@ const Search = () => {
   const categories = ['All', ...new Set(data?.map((product) => product.category.name))];
 
   return (
-    <Container>
+    <Container component={'main'}>
       <h3>Search Portfolio</h3>
       <FormControl fullWidth>
         <TextField

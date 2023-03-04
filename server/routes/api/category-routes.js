@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const { Category, Product } = require('../../models');
 const { Sequelize } = require('sequelize');
+const withAuth = require('../../utils/auth');
 
 // The `/api/categories` endpoint
 
@@ -40,7 +41,7 @@ router.get('/:id', (req, res) => {
 // create a new category
 // POST /api/categories
 // expects {name: "Books"}
-router.post('/', (req, res) => {
+router.post('/', withAuth, (req, res) => {
   Category.create(req.body)
     .then(dbCategoryData => res.json(dbCategoryData))
     .catch(err => {
@@ -52,7 +53,7 @@ router.post('/', (req, res) => {
 // update a category by its `id` value
 // PUT /api/categories/1
 // expects {name: "Books"}
-router.put('/:id', (req, res) => {
+router.put('/:id', withAuth, (req, res) => {
   Category.update(req.body, {
     where: { id: req.params.id }
   })
@@ -71,7 +72,7 @@ router.put('/:id', (req, res) => {
 
 // delete a category by its `id` value
 // DELETE /api/categories/1
-router.delete('/:id', (req, res) => {
+router.delete('/:id', withAuth, (req, res) => {
   Category.destroy({ where: { id: req.params.id } })
     .then(dbCategoryData => {
       if (!dbCategoryData) {

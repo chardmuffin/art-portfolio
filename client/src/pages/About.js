@@ -1,10 +1,11 @@
 import React from 'react';
+import { Container } from '@mui/material';
 
 const About = () => {
   return (
-    <main>
+    <Container component={'main'}>
       About Page
-    </main>
+    </Container>
   );
 };
 

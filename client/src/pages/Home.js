@@ -12,11 +12,17 @@ const Home = () => {
       .then((response) => response.data)
   );
 
+  if (isLoading) {
+    return <Container component={'main'}>Loading...</Container>;
+  }
+
+  if (isError) {
+    return <Container component={'main'}>Error: {error?.message ?? 'Unknown error'}</Container>;
+  }
+
   return (
-    <Container>
-      {isLoading && <div>Loading...</div>}
-      {isError && <div>Error: {error?.message ?? 'Unknown error'}</div>}
-      {data && <ProductList products={data} title="Original artwork for purchase" />}
+    <Container component={'main'}>
+      {data && <ProductList products={data} title="Artwork for purchase" />}
     </Container>
   );
 };

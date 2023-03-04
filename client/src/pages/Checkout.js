@@ -1,10 +1,12 @@
 import React from 'react';
+import { Container } from '@mui/material';
+
 
 const Checkout = () => {
   return (
-    <div>
+    <Container component={'main'}>
       Checkout Page
-    </div>
+    </Container>
   );
 };
 

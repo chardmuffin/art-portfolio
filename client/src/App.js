@@ -17,6 +17,7 @@ import Signup from './pages/Signup';
 import Search from './pages/Search';
 import Checkout from './pages/Checkout';
 import About from './pages/About';
+import Product from './pages/Product';
 
 const ColorModeContext = createContext({ toggleColorMode: () => {} });
 
@@ -56,6 +57,7 @@ function App() {
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/search" element={<Search />} />
+                <Route path="/products/:id" element={<Product />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/checkout" element={<Checkout />} />
                 <Route path="*" element={<NoMatch />} />

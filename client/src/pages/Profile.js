@@ -1,6 +1,7 @@
 import React from 'react';
 import axios from 'axios';
 import { useQuery } from 'react-query';
+import { Container } from '@mui/material';
 
 const Profile = (userId) => {
 
@@ -20,9 +21,9 @@ const Profile = (userId) => {
   }
 
   return (
-    <main>
+    <Container component={'main'}>
       Profile
-    </main>
+    </Container>
   );
 };
 

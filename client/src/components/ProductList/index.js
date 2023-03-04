@@ -6,6 +6,7 @@ import {
   ImageListItem,
   Typography
 } from '@mui/material';
+import { Link } from 'react-router-dom';
 
 const ProductList = ({ products, title }) => {
 
@@ -20,12 +21,15 @@ const ProductList = ({ products, title }) => {
         <ImageList variant="masonry" cols={cols} gap={30}>
           {products &&
             products.map((product) => (
+              
               <ImageListItem key={product.id} sx={{ maxWidth: width, mx: 'auto' }}>
-                <img
-                  src={`http://localhost:3001/api/products/images/${product.image.id}?width=${width}`}
-                  alt={product.name}
-                  loading="lazy"
-                />
+                <Link to={`/products/${product.id}`}>
+                  <img
+                    src={`http://localhost:3001/api/products/images/${product.image.id}?width=${width}`}
+                    alt={product.name}
+                    loading="lazy"
+                  />
+                </Link>
               </ImageListItem>
             )
           )}

@@ -4,6 +4,7 @@ const { Sequelize } = require('sequelize');
 const sharp = require('sharp');
 const fs = require('fs');
 const path = require('path');
+const withAuth = require('../../utils/auth');
 
 // the `/api/products` endpoint
 
@@ -157,7 +158,7 @@ router.get('/images/:id', (req, res) => {
       //apply max width and/or height and send resized image
       const pipeline = sharp(dbImageData.data);
       if (width || height) {
-        pipeline.resize(width, height);
+        pipeline.resize(width, height, { fit: 'inside' });
       }
 
       pipeline.toBuffer((err, data, info) => {
@@ -182,7 +183,7 @@ router.get('/images/:id', (req, res) => {
     category_id: 1                                                                            // optional
   }   
 */
-router.post('/', (req, res) => {
+router.post('/', withAuth, (req, res) => {
   Product.create(req.body)
     .then(dbProductData => res.json(dbProductData))
     .catch((err) => {
@@ -219,7 +220,7 @@ router.put('/:id', (req, res) => {
 
 // delete product by id, and associated product options and image
 // DELETE /api/products/1
-router.delete('/:id', (req, res) => {
+router.delete('/:id', withAuth, (req, res) => {
   Product.destroy({
     where: { id: req.params.id }
   })
@@ -246,7 +247,7 @@ router.delete('/:id', (req, res) => {
 //   "product_id": 1,
 //   "option_id": 1
 // }
-router.post('/options', (req, res) => {
+router.post('/options', withAuth, (req, res) => {
   ProductOption.create(req.body)
     .then(dbProductOptionData => res.json(dbProductOptionData))
     .catch(err => {
@@ -263,7 +264,7 @@ router.post('/options', (req, res) => {
 //   "product_id": 1,
 //   "option_id": 1
 // }
-router.put('/options/:id', (req, res) => {
+router.put('/options/:id', withAuth, (req, res) => {
   ProductOption.update(req.body, {
     where: {
       id: req.params.id
@@ -284,7 +285,7 @@ router.put('/options/:id', (req, res) => {
 
 // delete a single product option by id
 // DELETE /api/products/options/1
-router.delete('/options/:id', (req, res) => {
+router.delete('/options/:id', withAuth, (req, res) => {
   ProductOption.destroy({
     where: {
       id: req.params.id
@@ -312,7 +313,7 @@ router.delete('/options/:id', (req, res) => {
 //                              // a large, compressed image in jpg format. e.g dimensions 3000w x 4000h and 500KB.
 //   "product_id": 1
 // }
-router.post('/images', (req, res) => {
+router.post('/images', withAuth, (req, res) => {
   const { filename, product_id } = req.body;
 
   if (!filename) {
@@ -349,7 +350,7 @@ router.post('/images', (req, res) => {
 //   "filename": 'artie.jpg'   // optional
 //   "product_id": 1           // optional
 // }
-router.put('/images/:id', async (req, res) => {
+router.put('/images/:id', withAuth, async (req, res) => {
   const { id } = req.params;
   const { filename, product_id } = req.body;
   try {
@@ -385,7 +386,7 @@ router.put('/images/:id', async (req, res) => {
 
 // delete a single product image by id
 // DELETE /api/products/images/1
-router.delete('/images/:id', (req, res) => {
+router.delete('/images/:id', withAuth, (req, res) => {
   Image.destroy({
     where: {
       id: req.params.id

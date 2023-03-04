@@ -36,10 +36,14 @@ const Header = (props) => {
   const drawer = (
     <>
       <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center' }}>
-        <Typography variant="h6" sx={{ my: 2 }}>
-          Original Paintings
-        </Typography>
+        <Box component={Link} to={'/'} sx={{color: 'inherit', textDecoration: 'none'}}>
+          <Typography variant="h6" sx={{ my: 2 }}>
+            Original Paintings
+          </Typography>
+        </Box>
+        
         <Divider />
+
         <List>
           <ListItem disablePadding>
             <ListItemButton component={Link} to={'/'} sx={{ textAlign: 'center' }}>
@@ -58,7 +62,9 @@ const Header = (props) => {
           </ListItem>
         </List>
       </Box>
+
       <Divider />
+
       <Box sx={{ flexGrow: 1 }}/>
       <Box
         sx={{
@@ -98,13 +104,21 @@ const Header = (props) => {
       {/* top bar (tablet/desktop) */}
       <AppBar component="nav" color="primary" sx={{ display: { xs: 'none', sm: 'block' } }}>
         <Toolbar>
-          <Typography
-            variant="h4"
-            component="h1"
-            sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}
+          <Box
+            component={Link}
+            to={'/'}
+            sx={{
+                flexGrow: 1,
+                display: { xs: 'none', sm: 'block' },
+                color: 'inherit',
+                textDecoration: 'none'
+              }}
           >
-            Original Paintings
-          </Typography>
+            <Typography variant="h4" component="h1">
+              Original Paintings
+            </Typography>
+          </Box>
+
           <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
             <Button component={Link} to={'/'} color="inherit">
               Browse

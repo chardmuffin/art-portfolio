@@ -1,11 +1,12 @@
 const router = require('express').Router();
 const { Order, OrderDetail } = require('../../models');
+const withAuth = require('../../utils/auth');
 
 // the `/api/orders` endpoint
 
 // get all orders with order details
 // GET /api/orders
-router.get('/', (req, res) => {
+router.get('/', withAuth, (req, res) => {
   Order.findAll({
     include: OrderDetail
   })
@@ -18,7 +19,7 @@ router.get('/', (req, res) => {
 
 // get one order by id with order details
 // GET /api/orders/1
-router.get('/:id', (req, res) => {
+router.get('/:id', withAuth, (req, res) => {
   Order.findOne({
     where: { id: req.params.id },
     include: OrderDetail
@@ -45,7 +46,7 @@ router.get('/:id', (req, res) => {
     address:
   }
 */
-router.post('/', (req, res) => {
+router.post('/', withAuth, (req, res) => {
 
 });
 

@@ -2,9 +2,25 @@ const express = require('express');
 const routes = require('./routes');
 const sequelize = require('./config/connection');
 const cors = require('cors');
+const session = require('express-session');
+require('dotenv').config();
+
+const SequelizeStore = require('connect-session-sequelize')(session.Store);
+
+const sess = {
+  secret: process.env.SECRET,
+  cookie: {},
+  resave: false,
+  saveUninitialized: true,
+  store: new SequelizeStore({
+    db: sequelize
+  })
+};
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+app.use(session(sess)); // use express-session
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
