@@ -110,6 +110,43 @@ router.get('/:id', (req, res) => {
     })
 });
 
+// get product options by product id
+// GET /api/products/1/options
+router.get('/:id/options', (req, res) => {
+  Product.findOne({
+    where: { id: req.params.id },
+    include: [
+      Category,
+      {
+        model: Image,
+        attributes: { exclude: ['data', 'product_id'] }
+      },
+      {
+        model: ProductOption,
+        attributes: { exclude: ['product_id', 'option_id', 'option_group_id'] },
+        include: [
+          {
+            model: Option,
+            attributes: { exclude: ['option_group_id'] },
+            include: OptionGroup
+          }
+        ]
+      },
+    ],
+    attributes: { exclude: ['category_id'] }
+  })
+    .then(dbProductData => {
+      if (!dbProductData) {
+        res.status(404).json({ message: 'Unable to find product with this id' });
+        return;
+      }
+      res.json(dbProductData)})
+    .catch(err => {
+      console.log(err);
+      res.status(500).json(err);
+    })
+});
+
 // get a single product option by id
 // GET /api/products/options/1
 router.get('/options/:id', (req, res) => {
