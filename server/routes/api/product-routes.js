@@ -39,7 +39,7 @@ router.get('/', (req, res) => {
 // GET /api/products/options
 router.get('/options', (req, res) => {
   ProductOption.findAll({
-    attributes: { exclude: ['product_id', 'option_id', 'option_group_id'] },
+    attributes: { exclude: ['product_id', 'option_id_1', 'option_id_2', 'option_id_3', 'option_group_id'] },
     include: [
       {
         model: Product,
@@ -47,7 +47,20 @@ router.get('/options', (req, res) => {
       },
       {
         model: Option,
-        attributes: { exclude: ['option_group_id'] },
+        as: 'option_1',
+        attributes: ['id', 'name'],
+        include: OptionGroup
+      },
+      {
+        model: Option,
+        as: 'option_2',
+        attributes: ['id', 'name'],
+        include: OptionGroup
+      },
+      {
+        model: Option,
+        as: 'option_3',
+        attributes: ['id', 'name'],
         include: OptionGroup
       }
     ]
@@ -123,11 +136,24 @@ router.get('/:id/options', (req, res) => {
       },
       {
         model: ProductOption,
-        attributes: { exclude: ['product_id', 'option_id', 'option_group_id'] },
-        include: [
+        attributes: { exclude: ['product_id', 'option_id_1', 'option_id_2', 'option_id_3', 'option_group_id'] },
+        include: [          
           {
             model: Option,
-            attributes: { exclude: ['option_group_id'] },
+            as: 'option_1',
+            attributes: ['id', 'name'],
+            include: OptionGroup
+          },
+          {
+            model: Option,
+            as: 'option_2',
+            attributes: ['id', 'name'],
+            include: OptionGroup
+          },
+          {
+            model: Option,
+            as: 'option_3',
+            attributes: ['id', 'name'],
             include: OptionGroup
           }
         ]
@@ -151,7 +177,7 @@ router.get('/:id/options', (req, res) => {
 // GET /api/products/options/1
 router.get('/options/:id', (req, res) => {
   ProductOption.findOne({
-    attributes: { exclude: ['product_id', 'option_id', 'option_group_id'] },
+    attributes: { exclude: ['product_id', 'option_id_1', 'option_id_2', 'option_id_3', 'option_group_id'] },
     where: { id: req.params.id },
     include: [
       {
@@ -160,7 +186,20 @@ router.get('/options/:id', (req, res) => {
       },
       {
         model: Option,
-        attributes: { exclude: ['option_group_id'] },
+        as: 'option_1',
+        attributes: ['id', 'name'],
+        include: OptionGroup
+      },
+      {
+        model: Option,
+        as: 'option_2',
+        attributes: ['id', 'name'],
+        include: OptionGroup
+      },
+      {
+        model: Option,
+        as: 'option_3',
+        attributes: ['id', 'name'],
         include: OptionGroup
       }
     ]
@@ -282,7 +321,9 @@ router.delete('/:id', withAuth, (req, res) => {
 //   "option_price": 10.99,
 //   "stock": 20,
 //   "product_id": 1,
-//   "option_id": 1
+//   "option_id_1": 1,
+//   "option_id_2": 4,        //optional
+//   "option_id_3": 7         //optional
 // }
 router.post('/options', withAuth, (req, res) => {
   ProductOption.create(req.body)
@@ -299,7 +340,9 @@ router.post('/options', withAuth, (req, res) => {
 //   "option_price": 10.99,
 //   "stock": 20,
 //   "product_id": 1,
-//   "option_id": 1
+//   "option_id_1": 1,
+//   "option_id_2": 4,
+//   "option_id_3": 7
 // }
 router.put('/options/:id', withAuth, (req, res) => {
   ProductOption.update(req.body, {

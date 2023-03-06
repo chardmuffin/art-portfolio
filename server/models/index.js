@@ -18,7 +18,7 @@ Image.belongsTo(Product, {
   foreignKey: 'product_id'
 });
 
-// Categories and Products
+// Products and Categories
 Category.hasMany(Product, {
   foreignKey: 'category_id',
   onDelete: 'CASCADE'
@@ -28,7 +28,7 @@ Product.belongsTo(Category, {
   foreignKey: 'category_id'
 });
 
-// Options, Option Groups, and Product Options
+// Options and Option Groups
 OptionGroup.hasMany(Option, {
   foreignKey: 'option_group_id',
   onDelete: 'CASCADE'
@@ -38,12 +38,37 @@ Option.belongsTo(OptionGroup, {
   foreignKey: 'option_group_id'
 });
 
+// Options and Product Options
 ProductOption.belongsTo(Option, {
-  foreignKey: 'option_id'
+  foreignKey: 'option_id_1',
+  as: 'option_1'
 });
 
 Option.hasMany(ProductOption, {
-  foreignKey: 'option_id',
+  foreignKey: 'option_id_1',
+  as: 'option_1',
+  onDelete: 'CASCADE'
+});
+
+ProductOption.belongsTo(Option, {
+  foreignKey: 'option_id_2',
+  as: 'option_2'
+});
+
+Option.hasMany(ProductOption, {
+  foreignKey: 'option_id_2',
+  as: 'option_2',
+  onDelete: 'CASCADE'
+});
+
+ProductOption.belongsTo(Option, {
+  foreignKey: 'option_id_3',
+  as: 'option_3'
+});
+
+Option.hasMany(ProductOption, {
+  foreignKey: 'option_id_3',
+  as: 'option_3',
   onDelete: 'CASCADE'
 });
 
