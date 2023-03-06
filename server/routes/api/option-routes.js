@@ -9,12 +9,8 @@ const withAuth = require('../../utils/auth');
 // GET /api/options
 router.get('/', (req, res) => {
   Option.findAll({
-    attributes: { exclude: ['option_group_id'] },
     include: OptionGroup,
-    attributes: {
-      exclude: ['option_group_id'],
-      include: [[Sequelize.literal('(SELECT COUNT(*) FROM `product_option` INNER JOIN `Product` ON `product_option`.`product_id` = `Product`.`id` WHERE `product_option`.`option_id` = `Option`.`id`)'), 'product_count']]
-    },
+    attributes: { exclude: ['option_group_id'] },
   })
     .then(dbOptionData => res.json(dbOptionData))
     .catch(err => {
@@ -55,7 +51,6 @@ router.get('/:id', (req, res) => {
     include: OptionGroup,
     attributes: {
       exclude: ['option_group_id'],
-      include: [[Sequelize.literal('(SELECT COUNT(*) FROM `product_option` INNER JOIN `Product` ON `product_option`.`product_id` = `Product`.`id` WHERE `product_option`.`option_id` = `Option`.`id`)'), 'product_count']]
     },
   })
     .then(dbOptionData => res.json(dbOptionData))
