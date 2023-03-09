@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Box, Container, Typography, useMediaQuery, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
+import { Box, Container, Typography, useMediaQuery, FormControl, InputLabel, MenuItem, Select, Divider, Grid } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useQuery } from 'react-query';
@@ -95,6 +95,17 @@ const Product = () => {
     });
   };
 
+  // get the price range for all product options in string format
+  const priceRangeString = product?.product_options ? (() => {
+    const prices = product?.product_options?.map(option => parseFloat(product.price) + parseFloat(option.price_difference)).sort((a, b) => a - b);
+    const minPrice = toMoneyFormat(prices[0]);
+    const maxPrice = toMoneyFormat(prices[prices.length - 1]);
+    if (isNaN(prices[0])) return `${toMoneyFormat(product.price)}`;
+    if (minPrice === maxPrice) return minPrice;
+    return `${minPrice} - ${maxPrice}`;
+  })() : "$0.00";
+
+  //calculate the price if options are selected
   const price = form.productOption
     ? parseFloat(product?.price ?? 0) +
       parseFloat(form.productOption.price_difference)
@@ -118,62 +129,88 @@ const Product = () => {
     <Container component={'main'}>
       {product && (
         <Box sx={{ mx: 'auto', my: 2, textAlign: 'center' }}>
-          <Typography variant='h6' gutterBottom>
-            {product.name}
-          </Typography>
-          <img
-            src={`http://localhost:3001/api/products/images/${product.image.id}?width=${width}&height=${height}`}
-            alt={product.name}
-            loading="lazy"
-          />
-          <Typography gutterBottom>
-            {toMoneyFormat(price)}
-          </Typography>
-          {stock <= 3 && (
-            <Typography>
-              Only {stock} left in stock!
-            </Typography>
-          )}
-          {availableGroups.length > 0 && (
-            <Box sx={{ mx: 'auto', my: 2, textAlign: 'center', display: 'flex', flexWrap: 'nowrap', width: '90%' }}>
-              {availableGroups.map((optionGroup, index) => (
-                <FormControl
-                  fullWidth
-                  key={`option-group-${index + 1}`}
-                  sx={{ mx: 1 }}
-                >
-                  <InputLabel
-                    id={`option-group-${index + 1}-label`}
-                  >
-                    {optionGroup.name}
-                  </InputLabel>
-                  <Select
-                    labelId={`option-group-${index + 1}-label`}
-                    value={form.options[index] || ''}
-                    onChange={(e) => handleFormChange(index, e.target.value)}
-                  >
-                    {optionGroup.options?.map((opt) => (
-                      <MenuItem
-                        key={opt.id}
-                        value={opt.name}
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={9}>
+              <Box component={'img'}
+                src={`http://localhost:3001/api/products/images/${product.image.id}?width=${width}&height=${height}`}
+                alt={product.name}
+                loading="lazy"
+                sx={{
+                  my: 2,
+                  boxShadow: '4px 4px 20px rgba(0, 0, 0, 0.8)',
+                  borderRadius: '2px'
+                }}
+              />
+            </ Grid>
+            <Grid item xs={12} md={3}>
+              <Box sx={{ my: 2, fontStyle: 'italic', textAlign: 'left', letterSpacing: 2 }}>
+                <Typography variant='h4' >
+                  {product.name}
+                </Typography>
+                <Typography sx={{ mt: 2 }}>
+                  Fine Art by Richard Huffman
+                </Typography>
+                <Typography>
+                  {priceRangeString}
+                </Typography>
+              </Box>
+              
+              <Divider sx={{ my: 2 }} />
+
+              {availableGroups.length > 0 && (
+                <Box sx={{ mx: 'auto', my: 2, textAlign: 'center', display: 'flex', flexWrap: 'nowrap', width: '90%' }}>
+                  {availableGroups.map((optionGroup, index) => (
+                    <FormControl
+                      fullWidth
+                      key={`option-group-${index + 1}`}
+                      sx={{ mx: 1, my: 1 }}
+                    >
+                      <InputLabel
+                        id={`option-group-${index + 1}-label`}
                       >
-                        {opt.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              ))}
-            </Box>
-          )}
-          <Typography gutterBottom>
+                        {optionGroup.name}
+                      </InputLabel>
+                      <Select
+                        labelId={`option-group-${index + 1}-label`}
+                        value={form.options[index] || ''}
+                        onChange={(e) => handleFormChange(index, e.target.value)}
+                      >
+                        {optionGroup.options?.map((opt) => (
+                          <MenuItem
+                            key={opt.id}
+                            value={opt.name}
+                          >
+                            {opt.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  ))}
+                </Box>
+              )}
+              {stock <= 3 && (
+                <Typography sx={{ fontStyle: 'italic', textAlign: 'left' }}>
+                  {stock} left in stock!
+                </Typography>
+              )}
+              <Typography sx={{ textAlign: 'left' }}>
+                Total: {toMoneyFormat(price)}
+              </Typography>
+            </Grid>
+          </Grid>
+
+          <Divider sx={{ my: 2 }} />
+
+          <Typography gutterBottom sx={{ typography: 'subtitle2', textAlign: 'left' }}>
+            About the Painting
+          </Typography>
+          <Typography sx={{ textAlign: 'left', mx: 2 }}>
             {product.description}
           </Typography>
         </Box>
       )}
     </Container>
   );
-  
-  
 };
 
 export default Product;

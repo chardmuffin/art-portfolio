@@ -18,17 +18,20 @@ const ProductList = ({ products, title }) => {
 
   return (
     <Box sx={{ mx: 'auto', my: 2 }}>
-      <Typography variant='h6'>{title}</Typography>
+      <Typography variant='h6' sx={{ my: 2 }}>
+        {title}
+      </Typography>
         <ImageList variant="masonry" cols={cols} gap={30}>
           {products &&
             products.map((product) => (
               
               <ImageListItem key={product.id} sx={{ maxWidth: width, maxHeight: height, mx: 'auto', textAlign: 'center' }}>
                 <Link to={`/products/${product.id}`}>
-                  <img
+                  <Box component={'img'}
                     src={`http://localhost:3001/api/products/images/${product.image.id}?width=${width}&height=${height}`}
                     alt={product.name}
                     loading="lazy"
+                    sx={{ boxShadow: 3 }}
                   />
                 </Link>
               </ImageListItem>

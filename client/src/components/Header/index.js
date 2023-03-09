@@ -86,84 +86,84 @@ const Header = (props) => {
   const container = window !== undefined ? () => window().document.body : undefined;
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <>
+      <Box sx={{ display: 'flex' }}>
 
-      {/* bottom bar (mobile) */}
-      <AppBar position="fixed" color="primary" sx={{ top: 'auto', bottom: 0, display: { sm: 'none'} }}>
-        <Toolbar>
-          <IconButton color="inherit" aria-label="open drawer" onClick={handleDrawerToggle}>
-            <MenuIcon />
-          </IconButton>
-          <Box sx={{ flexGrow: 1 }} />
-          <IconButton component={Link} to={'/checkout'} color="inherit">
-            <ShoppingCartOutlined />
-          </IconButton>
-        </Toolbar>
-      </AppBar>
-
-      {/* top bar (tablet/desktop) */}
-      <AppBar component="nav" color="primary" sx={{ display: { xs: 'none', sm: 'block' } }}>
-        <Toolbar>
-          <Box
-            component={Link}
-            to={'/'}
-            sx={{
-                flexGrow: 1,
-                display: { xs: 'none', sm: 'block' },
-                color: 'inherit',
-                textDecoration: 'none'
-              }}
-          >
-            <Typography variant="h4" component="h1">
-              Original Paintings
-            </Typography>
-          </Box>
-
-          <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-            <Button component={Link} to={'/'} color="inherit">
-              Browse
-            </Button>
-            <Button component={Link} to={'/search'} color="inherit">
-              Search
-            </Button>
-            <Button component={Link} to={'/about'} color="inherit">
-              About
-            </Button>
-            <IconButton component={Link} to={'/checkout'} color="inherit">
-              <ShoppingCartOutlined />
+        {/* bottom bar (mobile) */}
+        <AppBar component="nav" position="fixed" color="primary" sx={{ bottom: 0, top: 'auto', display: { sm: 'none' }, opacity: '0.85' }}>
+          <Toolbar>
+            <IconButton color="inherit" aria-label="open drawer" onClick={handleDrawerToggle}>
+              <MenuIcon sx={{ opacity: '1' }} />
             </IconButton>
-          </Box>
-        </Toolbar>
-      </AppBar>
+            <Box sx={{ flexGrow: 1 }} />
+            <IconButton component={Link} to={'/checkout'} color="inherit">
+              <ShoppingCartOutlined sx={{ opacity: '1' }}/>
+            </IconButton>
+          </Toolbar>
+        </AppBar>
 
-      {/* drawer (mobile) */}
-      <Box component="nav">
-        <Drawer
-          container={container}
-          variant="temporary"
-          open={mobileOpen}
-          onClose={handleDrawerToggle}
-          ModalProps={{
-            keepMounted: true, // Better open performance on mobile.
-          }}
-          sx={{
-            display: { xs: 'block', sm: 'none' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
-          }}
-        >
-          {drawer}
-        </Drawer>
+        {/* top bar (tablet/desktop) */}
+        <AppBar component="nav" position="static" color="primary" sx={{ display: { xs: 'none', sm: 'block' } }}>
+          <Toolbar>
+            <Box
+              component={Link}
+              to={'/'}
+              sx={{
+                  flexGrow: 1,
+                  display: { xs: 'none', sm: 'block' },
+                  color: 'inherit',
+                  textDecoration: 'none'
+                }}
+            >
+              <Typography variant="h4" component="h1">
+                Original Paintings
+              </Typography>
+            </Box>
+
+            <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+              <Button component={Link} to={'/'} color="inherit">
+                Browse
+              </Button>
+              <Button component={Link} to={'/search'} color="inherit">
+                Search
+              </Button>
+              <Button component={Link} to={'/about'} color="inherit">
+                About
+              </Button>
+              <IconButton component={Link} to={'/checkout'} color="inherit">
+                <ShoppingCartOutlined />
+              </IconButton>
+            </Box>
+          </Toolbar>
+        </AppBar>
+
+        {/* drawer (mobile) */}
+        <Box component="nav">
+          <Drawer
+            container={container}
+            variant="temporary"
+            open={mobileOpen}
+            onClose={handleDrawerToggle}
+            ModalProps={{
+              keepMounted: true, // Better open performance on mobile.
+            }}
+            sx={{
+              display: { xs: 'block', sm: 'none' },
+              '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+            }}
+          >
+            {drawer}
+          </Drawer>
+        </Box>
       </Box>
 
-      {/* space the height of header before content and dark mode switch (desktop) */}
-      <Box sx={{ pb: 3, display: { xs: 'none', sm: 'block' }, ml: 'auto' }}>
-        <Toolbar />
-        <DarkModeSwitch
+      {/* dark mode switch (desktop) */}
+      <Box sx={{ position: 'absolute', right: 0, display: { xs: 'none', sm: 'block' }, }}>
+        <DarkModeSwitch 
           ColorModeContext={props.ColorModeContext}
         />
       </Box>
-
-    </Box>
+    </>
   );
 };
 

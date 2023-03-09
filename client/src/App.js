@@ -36,6 +36,10 @@ function App() {
         palette: {
           mode,
         },
+        typography: {
+          fontFamily: 'Alegreya, Open Sans, sans-serif',
+          // ...
+        },
       }),
     [mode],
   );
