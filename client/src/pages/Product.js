@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react';
-import { Box, Container, Typography, useMediaQuery, FormControl, InputLabel, MenuItem, Select, Divider, Grid } from '@mui/material';
+import { Box, Container, Typography, useMediaQuery, FormControl, InputLabel, MenuItem, Select, Divider, Grid, Button } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useQuery } from 'react-query';
 import { toMoneyFormat } from '../utils/helpers';
 
-const Product = () => {
+const Product = ({ handleAddToCart }) => {
 
   // get the product id from url
   const { id } = useParams();
 
-  // query get all product options by product id
+  // query get all possible product options by product id
   // const product = product and productOptions data
   const { isLoading, isError, data: product, error } = useQuery('productOptions', () =>
     axios(`http://localhost:3001/api/products/${id}/options`, {
@@ -31,9 +31,10 @@ const Product = () => {
     }).then((response) => response.data)
   );
 
+  // selectedItem is an object that will contain the product data AND the selected productOption's data (based on combination of chosen options)
   const [form, setForm] = useState({
     options: [null, null, null],
-    productOption: null,
+    selectedItem: product,
   });
 
   const smallScreen = useMediaQuery('(max-width: 600px)');
@@ -44,7 +45,7 @@ const Product = () => {
   // what are the available options for this product?
   // compare optionGroups to productOptions
   const availableGroups = optionGroups?.filter((group) => {
-    // check if any productOption has an associated option in this group
+    // check if any productOptions has an associated option in this group
     const hasAssociatedOption = product?.product_options?.some((option) => (
       option.option_1?.option_group.id === group.id ||
       option.option_2?.option_group.id === group.id ||
@@ -52,11 +53,11 @@ const Product = () => {
     ));
   
     if (!hasAssociatedOption) {
-      // if no productOption has an associated option in this group, filter out all options
+      // if no productOption has an associated option in this group, filter out this optionGroup
       return false;
     }
   
-    // otherwise, filter out options that do not have any associated productOptions
+    // otherwise, only filter out options within the group that do not have any associated productOptions
     group.options = group.options?.filter((option) => (
       product?.product_options?.some((po) => (
         po.option_1?.name === option.name ||
@@ -75,7 +76,7 @@ const Product = () => {
       newOptions[index] = value;
 
       // calculate productOption and set in form
-      const currProductOption = product?.product_options?.find(option => {
+      const productOption = product?.product_options?.find(option => {
         const sortedPoOptions = [
           option.option_1?.name || null,
           option.option_2?.name || null,
@@ -87,13 +88,25 @@ const Product = () => {
           (option, index) => option === null || option === sortedOptionSelection[index]
         );
       });
+
+      // add the product data to the selectedItem object to be saved
       return {
         ...prevState,
         options: newOptions,
-        productOption: currProductOption,
+        selectedItem: productOption ? {
+          id: product.id,
+          name: product.name,
+          description: product.description,
+          price: product.price,
+          category: product.category,
+          image: product.image,
+          product_option: productOption
+        } : product
       };
     });
   };
+
+  console.log(form.selectedItem)
 
   // get the price range for all product options in string format
   const priceRangeString = product?.product_options ? (() => {
@@ -105,13 +118,13 @@ const Product = () => {
     return `${minPrice} - ${maxPrice}`;
   })() : "$0.00";
 
-  //calculate the price if options are selected
-  const price = form.productOption
+  // calculate the price if options are selected
+  const price = form.selectedItem?.product_option
     ? parseFloat(product?.price ?? 0) +
-      parseFloat(form.productOption.price_difference)
+      parseFloat(form.selectedItem?.product_option.price_difference)
     : parseFloat(product?.price ?? 0);
 
-  const stock = form.productOption?.stock ?? product?.stock ?? 0;
+  const stock = form.selectedItem?.product_option?.stock ?? product?.stock ?? 0;
 
   // useEffect(() => {
   //   console.log("form",form);
@@ -144,7 +157,7 @@ const Product = () => {
             </ Grid>
             <Grid item xs={12} md={3}>
               <Box sx={{ my: 2, fontStyle: 'italic', textAlign: 'left', letterSpacing: 2 }}>
-                <Typography variant='h4' >
+                <Typography variant='h4' component="h2" >
                   {product.name}
                 </Typography>
                 <Typography sx={{ mt: 2 }}>
@@ -158,7 +171,7 @@ const Product = () => {
               <Divider sx={{ my: 2 }} />
 
               {availableGroups.length > 0 && (
-                <Box sx={{ mx: 'auto', my: 2, textAlign: 'center', display: 'flex', flexWrap: 'nowrap', width: '90%' }}>
+                <Box sx={{ mx: 'auto', my: 2, textAlign: 'center', display: 'flex', width: '100%' }}>
                   {availableGroups.map((optionGroup, index) => (
                     <FormControl
                       fullWidth
@@ -174,6 +187,7 @@ const Product = () => {
                         labelId={`option-group-${index + 1}-label`}
                         value={form.options[index] || ''}
                         onChange={(e) => handleFormChange(index, e.target.value)}
+                        fullWidth
                       >
                         {optionGroup.options?.map((opt) => (
                           <MenuItem
@@ -189,13 +203,21 @@ const Product = () => {
                 </Box>
               )}
               {stock <= 3 && (
-                <Typography sx={{ fontStyle: 'italic', textAlign: 'left' }}>
+                <Typography sx={{ fontStyle: 'italic', textAlign: 'center', mb: 2, mt: -1 }}>
                   {stock} left in stock!
                 </Typography>
               )}
-              <Typography sx={{ textAlign: 'left' }}>
-                Total: {toMoneyFormat(price)}
-              </Typography>
+              {(form.selectedItem?.product_option || availableGroups.length <= 0) &&
+                <Box sx={{ mx: 'auto', my: 2, textAlign: 'center', display: 'flex', flexWrap: 'nowrap', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Typography sx={{ textAlign: 'left' }}>
+                    Total: {toMoneyFormat(price)}
+                  </Typography>
+                  <Button variant='contained' onClick={() => handleAddToCart(form.selectedItem)}>
+                    ADD TO CART
+                  </Button>
+                </Box>
+              }
+              
             </Grid>
           </Grid>
 

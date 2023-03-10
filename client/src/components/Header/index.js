@@ -17,16 +17,14 @@ import ShoppingCartOutlined from '@mui/icons-material/ShoppingCartOutlined';
 
 import DarkModeSwitch from '../DarkModeSwitch';
 
-
 const drawerWidth = 240;
 
-const Header = (props) => {
+const Header = ({ window, cartCount, ColorModeContext }) => {
   const logout = event => {
     event.preventDefault();
 
   };
 
-  const { window } = props;
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const handleDrawerToggle = () => {
@@ -37,7 +35,7 @@ const Header = (props) => {
     <>
       <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center' }}>
         <Box component={Link} to={'/'} sx={{color: 'inherit', textDecoration: 'none'}}>
-          <Typography variant="h6" sx={{ my: 2 }}>
+          <Typography variant="h6" component="h1" sx={{ my: 2 }}>
             Original Paintings
           </Typography>
         </Box>
@@ -60,6 +58,11 @@ const Header = (props) => {
               <ListItemText primary={'About'} />
             </ListItemButton>
           </ListItem>
+          <ListItem disablePadding>
+            <ListItemButton component={Link} to={'/contact'} sx={{ textAlign: 'center' }}>
+              <ListItemText primary={'Contact'} />
+            </ListItemButton>
+          </ListItem>
         </List>
       </Box>
 
@@ -76,7 +79,7 @@ const Header = (props) => {
         }}
       >
         <DarkModeSwitch
-          ColorModeContext={props.ColorModeContext}
+          ColorModeContext={ColorModeContext}
         />
       </Box>
     </>
@@ -97,6 +100,7 @@ const Header = (props) => {
             </IconButton>
             <Box sx={{ flexGrow: 1 }} />
             <IconButton component={Link} to={'/checkout'} color="inherit">
+              <Typography>({cartCount})</Typography>
               <ShoppingCartOutlined sx={{ opacity: '1' }}/>
             </IconButton>
           </Toolbar>
@@ -130,6 +134,9 @@ const Header = (props) => {
               <Button component={Link} to={'/about'} color="inherit">
                 About
               </Button>
+              <Button component={Link} to={'/contact'} color="inherit">
+                Contact
+              </Button>
               <IconButton component={Link} to={'/checkout'} color="inherit">
                 <ShoppingCartOutlined />
               </IconButton>
@@ -160,7 +167,7 @@ const Header = (props) => {
       {/* dark mode switch (desktop) */}
       <Box sx={{ position: 'absolute', right: 0, display: { xs: 'none', sm: 'block' }, }}>
         <DarkModeSwitch 
-          ColorModeContext={props.ColorModeContext}
+          ColorModeContext={ColorModeContext}
         />
       </Box>
     </>

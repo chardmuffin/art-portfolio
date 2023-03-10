@@ -14,6 +14,7 @@ Order.init(
     },
     user_id: {
       type: DataTypes.INTEGER,
+      defaultValue: 1,
       references: {
         model: 'user',
         key: 'id',
