@@ -20,14 +20,15 @@ const DarkModeSwitch = (props) => {
       sx={{
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        flexWrap: 'nowrap'
       }}
     >
-      <Typography variant='subtitle2'>
+      <Typography variant='caption'>
         {capitalizeFirstLetter(theme.palette.mode)} Mode
       </Typography>
       <IconButton onClick={colorMode.toggleColorMode} color="inherit">
-        {theme.palette.mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
+        {theme.palette.mode === 'dark' ? <Brightness7Icon fontSize='small'/> : <Brightness4Icon fontSize='small'/>}
       </IconButton>
     </Box>
   );

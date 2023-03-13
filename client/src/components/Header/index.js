@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -14,17 +14,13 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import ShoppingCartOutlined from '@mui/icons-material/ShoppingCartOutlined';
+import ShoppingCartTwoToneIcon from '@mui/icons-material/ShoppingCartTwoTone';
 
 import DarkModeSwitch from '../DarkModeSwitch';
 
 const drawerWidth = 240;
 
-const Header = ({ window, cartCount, ColorModeContext }) => {
-  const logout = event => {
-    event.preventDefault();
-
-  };
-
+const Header = ({ window, cartCount, ColorModeContext, isCartAnimating }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const handleDrawerToggle = () => {
@@ -34,9 +30,12 @@ const Header = ({ window, cartCount, ColorModeContext }) => {
   const drawer = (
     <>
       <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center' }}>
-        <Box component={Link} to={'/'} sx={{color: 'inherit', textDecoration: 'none'}}>
-          <Typography variant="h6" component="h1" sx={{ my: 2 }}>
-            Original Paintings
+        <Box component={Link} to={'/'} sx={{color: 'inherit', textDecoration: 'none' }}>
+          <Typography variant="h6" component="h1" mt={2}>
+            Richard Huffman
+          </Typography>
+          <Typography variant="subtitle2" sx={{ mx: 2, fontStyle: 'italic', letterSpacing: 2, mb: 2 }}>
+            Fine Art
           </Typography>
         </Box>
         
@@ -90,21 +89,31 @@ const Header = ({ window, cartCount, ColorModeContext }) => {
 
   return (
     <>
-      <Box sx={{ display: 'flex' }}>
+      <Box sx={{ display: 'flex', flexWrap: 'nowrap' }}>
 
-        {/* bottom bar (mobile) */}
-        <AppBar component="nav" position="fixed" color="primary" sx={{ bottom: 0, top: 'auto', display: { sm: 'none' }, opacity: '0.85' }}>
+        {/* top bar (mobile) */}
+        <AppBar component="nav" position="fixed" color="primary" sx={{ bottom: 'auto', top: 0, display: { sm: 'none' }, opacity: '0.85', minHeight: 'none' }}>
           <Toolbar>
             <IconButton color="inherit" aria-label="open drawer" onClick={handleDrawerToggle}>
               <MenuIcon sx={{ opacity: '1' }} />
             </IconButton>
             <Box sx={{ flexGrow: 1 }} />
-            <IconButton component={Link} to={'/checkout'} color="inherit">
+            <IconButton
+              className={isCartAnimating ? 'cart-icon wiggle' : 'cart-icon'}
+              component={Link}
+              to={'/checkout'}
+              color="inherit"
+            >
               <Typography>({cartCount})</Typography>
               <ShoppingCartOutlined sx={{ opacity: '1' }}/>
             </IconButton>
           </Toolbar>
         </AppBar>
+
+        {/* spacing before content (mobile) */}
+        <Box sx={{ display: { sm: 'none' }, my: 3}}>
+          <Toolbar />
+        </Box>
 
         {/* top bar (tablet/desktop) */}
         <AppBar component="nav" position="static" color="primary" sx={{ display: { xs: 'none', sm: 'block' } }}>
@@ -119,12 +128,15 @@ const Header = ({ window, cartCount, ColorModeContext }) => {
                   textDecoration: 'none'
                 }}
             >
-              <Typography variant="h4" component="h1">
-                Original Paintings
+              <Typography variant="h5" component="h1" >
+                Richard Huffman
+              </Typography>
+              <Typography variant="subtitle2" sx={{ mx: 2, fontStyle: 'italic', letterSpacing: 2 }}>
+                Fine Art
               </Typography>
             </Box>
 
-            <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+            <Box sx={{ display: { xs: 'none', sm: 'block' }, textAlign: 'right' }}>
               <Button component={Link} to={'/'} color="inherit">
                 Browse
               </Button>
@@ -137,9 +149,15 @@ const Header = ({ window, cartCount, ColorModeContext }) => {
               <Button component={Link} to={'/contact'} color="inherit">
                 Contact
               </Button>
-              <IconButton component={Link} to={'/checkout'} color="inherit">
-                <ShoppingCartOutlined />
-              </IconButton>
+              <IconButton
+                className={isCartAnimating ? 'wiggle' : ''}
+                component={Link}
+                to={'/checkout'}
+                color="inherit"
+              >
+                <Typography>({cartCount})</Typography>
+                {cartCount > 0 ? <ShoppingCartTwoToneIcon />: <ShoppingCartOutlined />}
+            </IconButton>
             </Box>
           </Toolbar>
         </AppBar>

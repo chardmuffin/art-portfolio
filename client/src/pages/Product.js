@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Box, Container, Typography, useMediaQuery, FormControl, InputLabel, MenuItem, Select, Divider, Grid, Button } from '@mui/material';
+import { Snackbar, Box, Container, Typography, useMediaQuery, FormControl, InputLabel, MenuItem, Select, Divider, Grid, Button, IconButton, Slide } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
+import DoneIcon from '@mui/icons-material/Done';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useQuery } from 'react-query';
@@ -34,12 +36,23 @@ const Product = ({ handleAddToCart }) => {
   // selectedItem is an object that will contain the product data AND the selected productOption's data (based on combination of chosen options)
   const [form, setForm] = useState({
     options: [null, null, null],
-    selectedItem: product,
+    selectedItem: null
   });
 
+  // for products with no product_options, update selectedItem = product once axios fetches the product
+  useEffect(() => {
+    setForm(prevState => ({
+      ...prevState,
+      selectedItem: product || null,
+    }));
+  }, [product]);
+
+  // alert is shown if item added to cart
+  const [showAlert, setShowAlert] = useState(false);
+
   const smallScreen = useMediaQuery('(max-width: 600px)');
-  //const mediumScreen = useMediaQuery('(max-width: 960px)');
-  const width = smallScreen ? 300 : 800;
+  const mediumScreen = useMediaQuery('(max-width: 960px)');
+  const width = smallScreen ? 300 : mediumScreen ? 550 : 800;
   const height = smallScreen ? 400 : 700;
   
   // what are the available options for this product?
@@ -106,17 +119,15 @@ const Product = ({ handleAddToCart }) => {
     });
   };
 
-  console.log(form.selectedItem)
-
   // get the price range for all product options in string format
   const priceRangeString = product?.product_options ? (() => {
     const prices = product?.product_options?.map(option => parseFloat(product.price) + parseFloat(option.price_difference)).sort((a, b) => a - b);
-    const minPrice = toMoneyFormat(prices[0]);
-    const maxPrice = toMoneyFormat(prices[prices.length - 1]);
-    if (isNaN(prices[0])) return `${toMoneyFormat(product.price)}`;
-    if (minPrice === maxPrice) return minPrice;
-    return `${minPrice} - ${maxPrice}`;
-  })() : "$0.00";
+    const minPrice = prices[0];
+    const maxPrice = prices[prices.length - 1];
+    if (isNaN(minPrice)) return toMoneyFormat(product?.price);
+    if (minPrice === maxPrice) return toMoneyFormat(minPrice);
+    return `${toMoneyFormat(minPrice)} - ${toMoneyFormat(maxPrice)}`;
+  })() : toMoneyFormat(product?.price);
 
   // calculate the price if options are selected
   const price = form.selectedItem?.product_option
@@ -126,10 +137,6 @@ const Product = ({ handleAddToCart }) => {
 
   const stock = form.selectedItem?.product_option?.stock ?? product?.stock ?? 0;
 
-  // useEffect(() => {
-  //   console.log("form",form);
-  // }, [form]);
-
   if (isLoading || isLoadingOptionGroups) {
     return <Container component={'main'}>Loading...</Container>;
   }
@@ -137,13 +144,15 @@ const Product = ({ handleAddToCart }) => {
   if (isError || isErrorOptionGroups) {
     return <Container component={'main'}>Error: {(error?.message || errorOptionGroups?.message) ?? 'Unknown error'}</Container>;
   }
+
+  // animate the add to cart button
   
   return (
     <Container component={'main'}>
       {product && (
         <Box sx={{ mx: 'auto', my: 2, textAlign: 'center' }}>
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={9}>
+          <Grid container spacing={4}>
+            <Grid item xs={12} md={8}>
               <Box component={'img'}
                 src={`http://localhost:3001/api/products/images/${product.image.id}?width=${width}&height=${height}`}
                 alt={product.name}
@@ -151,11 +160,12 @@ const Product = ({ handleAddToCart }) => {
                 sx={{
                   my: 2,
                   boxShadow: '4px 4px 20px rgba(0, 0, 0, 0.8)',
-                  borderRadius: '2px'
+                  borderRadius: '2px',
+                  maxWidth: '100%'
                 }}
               />
             </ Grid>
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} md={4}>
               <Box sx={{ my: 2, fontStyle: 'italic', textAlign: 'left', letterSpacing: 2 }}>
                 <Typography variant='h4' component="h2" >
                   {product.name}
@@ -209,11 +219,17 @@ const Product = ({ handleAddToCart }) => {
               )}
               {(form.selectedItem?.product_option || availableGroups.length <= 0) &&
                 <Box sx={{ mx: 'auto', my: 2, textAlign: 'center', display: 'flex', flexWrap: 'nowrap', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Typography sx={{ textAlign: 'left' }}>
+                  <Typography variant='h5' component='h3' sx={{ textAlign: 'left' }}>
                     Total: {toMoneyFormat(price)}
                   </Typography>
-                  <Button variant='contained' onClick={() => handleAddToCart(form.selectedItem)}>
-                    ADD TO CART
+                  <Button
+                    variant='contained'
+                    onClick={() => {
+                      handleAddToCart(form.selectedItem);
+                      setShowAlert(true);
+                    }}
+                  >
+                    <Typography variant='button'>add to cart</Typography>
                   </Button>
                 </Box>
               }
@@ -231,6 +247,29 @@ const Product = ({ handleAddToCart }) => {
           </Typography>
         </Box>
       )}
+      <Snackbar
+        open={showAlert}
+        autoHideDuration={4000}
+        onClose={() => setShowAlert(false)}
+        TransitionComponent={Slide}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        message={
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <DoneIcon fontSize='small' sx={{ mr: 1 }} /> 
+            <Typography variant='body1'>Added to cart!</Typography>
+          </Box>
+        }
+        action={
+          <IconButton
+            size="small"
+            aria-label="close"
+            color="inherit"
+            onClick={() => setShowAlert(false)}
+          >
+            <CloseIcon fontSize="small" />
+          </IconButton>
+        }
+      />
     </Container>
   );
 };

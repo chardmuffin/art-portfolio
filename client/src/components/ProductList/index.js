@@ -11,27 +11,28 @@ import { Link } from 'react-router-dom';
 const ProductList = ({ products, title }) => {
 
   const smallScreen = useMediaQuery('(max-width: 600px)');
-  const mediumScreen = useMediaQuery('(max-width: 960px)');
+  const mediumScreen = useMediaQuery('(max-width: 900px)');
   const cols = smallScreen ? 1 : (mediumScreen ? 2 : 3);
   const width = 300;
   const height = 350;
+
+  const marginX = smallScreen ? 'auto' : mediumScreen ? 8 : 6; // Set margin for two columns
 
   return (
     <Box sx={{ mx: 'auto', my: 2 }}>
       <Typography variant='h6' sx={{ my: 2 }}>
         {title}
       </Typography>
-        <ImageList variant="masonry" cols={cols} gap={30}>
+        <ImageList variant="masonry" cols={cols} gap={18} sx={{ mx: marginX }}>
           {products &&
             products.map((product) => (
-              
-              <ImageListItem key={product.id} sx={{ maxWidth: width, maxHeight: height, mx: 'auto', textAlign: 'center' }}>
+              <ImageListItem key={product.id} sx={{ textAlign: 'center', overflow: 'hidden', p: 2 }}>
                 <Link to={`/products/${product.id}`}>
                   <Box component={'img'}
                     src={`http://localhost:3001/api/products/images/${product.image.id}?width=${width}&height=${height}`}
                     alt={product.name}
                     loading="lazy"
-                    sx={{ boxShadow: 3 }}
+                    sx={{ maxWidth: '100%', maxHeight: '100%', borderRadius: '2px', boxShadow: 8 }}
                   />
                 </Link>
               </ImageListItem>

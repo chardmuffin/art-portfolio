@@ -35,3 +35,21 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* Add item to cart causes the cart icon to wiggle */
+@keyframes wiggle {
+  0% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-18deg);
+  }
+  75% {
+    transform: rotate(2deg);
+  }
+}
+
+.wiggle {
+  animation: wiggle 0.15s;
+  animation-iteration-count: 3;
+}

@@ -1,4 +1,4 @@
-import { useMemo, createContext } from 'react';
+import { useMemo, createContext, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
@@ -27,6 +27,8 @@ const ColorModeContext = createContext({ toggleColorMode: () => {} });
 function App() {
   const systemMode = useMediaQuery('(prefers-color-scheme: dark)') ? 'dark' : 'light';
   const [mode, setMode] = usePersistentState("RHArt-darkmode", systemMode);
+  
+  const [isCartAnimating, setIsCartAnimating] = useState(false);
 
   const colorMode = useMemo(() => ({
       toggleColorMode: () => {
@@ -54,6 +56,17 @@ function App() {
   // Add an item to the cart and save to local storage
   const handleAddToCart = (item) => {
     setCart([...cart, item]);
+    setIsCartAnimating(true);
+
+    // stop the animation after 1 second
+    setTimeout(() => {
+      setIsCartAnimating(false);
+    }, 1000);
+  }
+
+  // Remove an item from cart and save to local storage
+  const handleRemoveItem = (index) => {
+    setCart(cart.slice(0, index).concat(cart.slice(index + 1)));
   }
 
   return (
@@ -68,6 +81,7 @@ function App() {
               <Header
                 cartCount={cart.length}
                 ColorModeContext={ColorModeContext}
+                isCartAnimating={isCartAnimating}
               />
 
               <Routes>
@@ -78,7 +92,7 @@ function App() {
                 <Route path="/search" element={<Search />} />
                 <Route path="/products/:id" element={<Product handleAddToCart={handleAddToCart}/>} />
                 <Route path="/about" element={<About />} />
-                <Route path="/checkout" element={<Checkout cart={cart}/>} />
+                <Route path="/checkout" element={<Checkout cart={cart} handleRemoveItem={handleRemoveItem}/>} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="*" element={<NoMatch />} />
               </Routes>
