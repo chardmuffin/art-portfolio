@@ -2,7 +2,7 @@ import React from 'react';
 import ProductList from '../components/ProductList';
 import axios from 'axios';
 import { useQuery } from 'react-query';
-import { Container } from '@mui/material';
+import { Container, CircularProgress } from '@mui/material';
 
 const Home = () => {
   const { isLoading, isError, data, error } = useQuery('products', () =>
@@ -13,7 +13,7 @@ const Home = () => {
   );
 
   if (isLoading) {
-    return <Container component={'main'}>Loading...</Container>;
+    return <Container component={'main'}><CircularProgress /></Container>;
   }
 
   if (isError) {

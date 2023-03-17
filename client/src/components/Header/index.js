@@ -111,7 +111,7 @@ const Header = ({ window, cartCount, ColorModeContext, isCartAnimating }) => {
         </AppBar>
 
         {/* spacing before content (mobile) */}
-        <Box sx={{ display: { sm: 'none' }, my: 3}}>
+        <Box sx={{ display: { sm: 'none' } }}>
           <Toolbar />
         </Box>
 

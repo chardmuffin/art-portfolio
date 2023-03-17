@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Snackbar, Box, Container, Typography, useMediaQuery, FormControl, InputLabel, MenuItem, Select, Divider, Grid, Button, IconButton, Slide } from '@mui/material';
+import { Snackbar, Box, CircularProgress, Container, Typography, useMediaQuery, FormControl, InputLabel, MenuItem, Select, Divider, Grid, Button, IconButton, Slide } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import DoneIcon from '@mui/icons-material/Done';
 import { useParams } from 'react-router-dom';
@@ -138,7 +138,7 @@ const Product = ({ handleAddToCart }) => {
   const stock = form.selectedItem?.product_option?.stock ?? product?.stock ?? 0;
 
   if (isLoading || isLoadingOptionGroups) {
-    return <Container component={'main'}>Loading...</Container>;
+    return <Container component={'main'}><CircularProgress /></Container>;
   }
 
   if (isError || isErrorOptionGroups) {

@@ -21,6 +21,7 @@ import Product from './pages/Product';
 import Contact from './pages/Contact';
 
 import { usePersistentState } from './utils/hooks';
+import PaymentComplete from './pages/PaymentComplete';
 
 const ColorModeContext = createContext({ toggleColorMode: () => {} });
 
@@ -92,8 +93,9 @@ function App() {
                 <Route path="/search" element={<Search />} />
                 <Route path="/products/:id" element={<Product handleAddToCart={handleAddToCart}/>} />
                 <Route path="/about" element={<About />} />
-                <Route path="/checkout" element={<Checkout cart={cart} handleRemoveItem={handleRemoveItem}/>} />
+                <Route path="/checkout" element={<Checkout cart={cart} handleRemoveItem={handleRemoveItem} mode={mode} />} />
                 <Route path="/contact" element={<Contact />} />
+                <Route path="/payment-complete" element={<PaymentComplete />} />
                 <Route path="*" element={<NoMatch />} />
               </Routes>
             </Box>

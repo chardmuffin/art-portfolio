@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   useMediaQuery,
   Container,
@@ -7,27 +7,62 @@ import {
   Divider,
   Card,
   IconButton,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
   Grid,
   Button,
+  Stepper,
+  Step,
+  StepLabel,
+  StepContent,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { toMoneyFormat } from '../utils/helpers';
 import { Link } from 'react-router-dom';
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
+import axios from 'axios';
 
-const Checkout = ({ cart, handleRemoveItem }) => {
+import StripeCheckoutForm from '../components/StripeCheckoutForm';
+import ShippingAddressForm from '../components/ShippingAddressForm';
+import ConfirmRemoveItemDialog from '../components/ConfirmRemoveItemDialog';
 
+// Make sure to call loadStripe outside of a component’s render to avoid
+// recreating the Stripe object on every render.
+// This is your test publishable API key.
+const stripePromise = loadStripe("pk_test_51MlxOtIkA32m3k4INfMqyq2Nz6gVgheu3Y7gEqKQgPDnWWj9fRum27YKOnzXScpsrPIkzUD7Hxz7Dy2COGz4nK2Z009J1lob6N");
+
+const Checkout = ({ cart, handleRemoveItem, mode }) => {
+
+  // checkout page is split in shipping and payment stages using MUI stepper
+  const [activeStep, setActiveStep] = useState(0);
+
+  const handleNext = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+  };
+
+  const handleBack = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep - 1);
+  };
+  
+
+  // confirmation dialog box appears when removing an item from cart
   const [open, setOpen] = useState(false);
   const [itemToRemove, setItemToRemove] = useState({
     item: null,
     index: null
   });
 
-  //const smallScreen = useMediaQuery('(max-width: 600px)');
+  // shipping address form in step 1
+  const [formData, setFormData] = useState({
+    name: '',
+    addressLine1: '',
+    addressLine2: '',
+    city: '',
+    state: '',
+    zip: '',
+    phone: '',
+  });
+
+  // const smallScreen = useMediaQuery('(max-width: 600px)');
   const mediumScreen = useMediaQuery('(max-width: 900px)');
 
   // =================================================== process cart ===============================================
@@ -54,8 +89,8 @@ const Checkout = ({ cart, handleRemoveItem }) => {
   const [shipping, setShipping] = useState("TBD");
   const [total, setTotal] = useState("TBD");
 
-  const panelContent = (
-    <Box sx={{ m: 2 }}>
+  const subtotalPanel = (
+    <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
         <Typography variant='h5'>Subtotal:</Typography>
         <Typography variant='h5'>{toMoneyFormat(subtotal)}</Typography>
@@ -70,8 +105,8 @@ const Checkout = ({ cart, handleRemoveItem }) => {
       </Box>
       <Divider />
       <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-        <Typography variant='h5'>Total:</Typography>
-        <Typography variant='h5'>{total}</Typography>
+        <Typography variant='h4'>Total:</Typography>
+        <Typography variant='h4'>{total}</Typography>
       </Box>
     </Box>
   );
@@ -90,37 +125,69 @@ const Checkout = ({ cart, handleRemoveItem }) => {
     isRemoving && handleRemoveItem(itemToRemove.index);
   };
   
-  // Confirm remove item dialog (COMPONENT)
-  const ConfirmRemoveItem = () => {
-    return (
-      <Dialog
-        open={open}
-        onClose={() => handleClose(false)}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">
-          {"Confirm"}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Are you sure you want to remove {itemToRemove?.item?.name} from your cart?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button variant="outlined" onClick={() => handleClose(true)} autoFocus>
-            Ok
-          </Button>
-        </DialogActions>
-      </Dialog>
-    )
-  }
+  // ====================================== stripe =====================================
+  const [clientSecret, setClientSecret] = useState("");
 
+  const createPaymentIntent = async (cart) => {
+    try {
+      const response = await axios.post('api/orders/create-payment-intent', cart);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating payment intent:', error);
+      throw error;
+    }
+  };
+
+  useEffect(() => {
+    createPaymentIntent(cart)
+      .then((data) => setClientSecret(data.clientSecret))
+      .catch((error) => console.error('Error setting client secret:', error));
+  }, [cart]);
+
+  const appearance = {
+    theme: mode === 'dark' ? 'night' : 'stripe',
+  };
+  const options = {
+    clientSecret,
+    appearance,
+  };
+
+  const shippingPanelContent = (
+    <Box sx={{ my: 2 }}>
+      {/* show panel with subtotal, tax, shipping, etc */}
+      {cart.length > 0 && (
+        !mediumScreen ? (
+          <Card sx={{ boxShadow: 8, borderRadius: '4px', m: 2, mr: 0 }}>
+            <Box sx={{ m: 2 }}>
+              <ShippingAddressForm setFormData={setFormData} formData={formData}/>
+            </Box>
+          </Card>
+        ) : (
+          <Grid item xs={12} md={4}>
+            <Box>
+              <ShippingAddressForm setFormData={setFormData} formData={formData} />
+            </Box>
+          </Grid>
+        )
+      )}
+    </Box>
+  );
+
+  const paymentPanelContent = (
+    <>
+      {clientSecret && (
+        <Elements options={options} stripe={stripePromise}>
+          <StripeCheckoutForm />
+        </Elements>
+      )}
+    </>
+  );
+
+  // ============================================== jsx =================================================
   return (
     <Container component={'main'}>
       <Typography variant='h3' component="h2" sx={{ my: 4, textAlign: 'center' }}>Checkout Page</Typography>
-
+  
       {cart.length === 0 &&
         <Typography sx={{ my: 2, textAlign: 'center' }}>
           Cart is empty!
@@ -208,20 +275,59 @@ const Checkout = ({ cart, handleRemoveItem }) => {
 
         {/* show panel with subtotal, tax, shipping, etc */}
         {cart.length > 0 && (
-          <Grid item xs={12} md={4}>
-            {!mediumScreen ? (
-              <Card sx={{ boxShadow: 8, borderRadius: '4px' }}>{panelContent}</Card>
-            ) : (
-              <Box>{panelContent}</Box>
-            )}
+          !mediumScreen ? (
+            <Grid item md={4}>
+              <Card sx={{ boxShadow: 8, borderRadius: '4px' }}>
+                <Box sx={{ m: 2 }}>
+                  {subtotalPanel}
+                </Box>
+              </Card>
+            </Grid>
+          ) : (
+            <Grid item xs={12}>
+              <Box>{subtotalPanel}</Box>
+            </Grid>
+          )
+        )}
+
+        {!mediumScreen ? (
+          <Grid item xs={12}>
+            {shippingPanelContent}
+            {paymentPanelContent}
           </Grid>
+        ) : (
+          
+          <Stepper activeStep={activeStep} orientation='vertical'>
+            <Step sx={{ mt: 2 }}>
+              <StepLabel>Shipping Information</StepLabel>
+              <StepContent>
+                {shippingPanelContent}
+                <Button variant="contained" onClick={handleNext}>
+                  Next
+                </Button>
+              </StepContent>
+            </Step>
+            
+            <Step>
+              <StepLabel>Payment Information</StepLabel>
+              <StepContent>
+                {paymentPanelContent}
+                <Button variant="contained" onClick={handleBack}>
+                  Back
+                </Button>
+              </StepContent>
+            </Step>
+          </Stepper>
         )}
       </Grid>
-
-      <ConfirmRemoveItem />
-
+  
+      <ConfirmRemoveItemDialog
+        open={open}
+        handleClose={handleClose}
+        itemToRemove={itemToRemove}
+      />
     </Container>
   );
-};
+}
 
 export default Checkout;

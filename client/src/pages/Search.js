@@ -13,7 +13,8 @@ import {
   Slider,
   Select,
   InputAdornment,
-  MenuItem
+  MenuItem,
+  CircularProgress
 } from '@mui/material';
 
 const Search = () => {
@@ -110,7 +111,7 @@ const Search = () => {
           sx={{maxWidth: '90%', mx: 'auto', mb: 2}}
         />
       </FormGroup>
-      {isLoading && <div>Loading...</div>}
+      {isLoading && <CircularProgress />}
       {isError && <div>Error: {error?.message ?? 'Unknown error'}</div>}
       {data && <ProductList products={filteredProducts} title="Results" />}
     </Container>
