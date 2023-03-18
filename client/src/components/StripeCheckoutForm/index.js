@@ -7,7 +7,7 @@ import {
 import { Button } from "@mui/material";
 import { Box, Typography, CircularProgress } from "@mui/material";
 
-const StripeCheckoutForm = () => {
+const StripeCheckoutForm = ({ handleBack }) => {
   const stripe = useStripe();
   const elements = useElements();
 
@@ -84,22 +84,28 @@ const StripeCheckoutForm = () => {
 
   return (
     <Box sx={{ textAlign: 'center' }}>
-      <Box id="payment-element" sx={{ m: 2 }}>
+      <Box id="payment-element" sx={{ my: 2 }}>
         <PaymentElement options={paymentElementOptions} />
       </Box>
-      <Button
-        variant="outlined"
-        disabled={isLoading || !stripe || !elements}
-        id="submit"
-        type="submit"
-        onClick={handleSubmit}
-      >
-        {isLoading ? (
-          <CircularProgress />
-        ) : (
-          <Typography variant='button'>Place Order</Typography>
-        )}
-      </Button>
+      <Box sx={{ display: 'flex', justifyContent: 'space-around', mb: 2 }}>
+        <Button variant="contained" onClick={handleBack} sx={{ display: { md: 'none' } }}>
+          <Typography variant='button'>Back</Typography>
+        </Button>
+        <Button
+          variant="outlined"
+          disabled={isLoading || !stripe || !elements}
+          id="submit"
+          type="submit"
+          onClick={handleSubmit}
+        >
+          {isLoading ? (
+            <CircularProgress />
+          ) : (
+            <Typography variant='button'>Place Order</Typography>
+          )}
+        </Button>
+      </Box>
+        
       {/* Show any error or success messages */}
       {message && (
         <Typography sx={{ mt: 2 }} variant="subtitle1" color={message.startsWith('Payment succeeded') ? 'success' : 'error'}>
