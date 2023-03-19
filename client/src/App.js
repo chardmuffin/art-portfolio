@@ -52,18 +52,40 @@ function App() {
     [mode],
   );
 
+  // cart processing
   const [cart, setCart] = usePersistentState("RHArt-cart", Array(0));
 
   // Add an item to the cart and save to local storage
+  // preprocess cart (calculate/set quantity for each item)
+  // if item is not in the cart already, add attribute "quantity" and set to 1, else increment the quantity
   const handleAddToCart = (item) => {
-    setCart([...cart, item]);
+    const itemIndex = cart.findIndex((cartItem) => {
+      if (item.product_option && cartItem.product_option) {
+        return cartItem.product_option.id === item.product_option.id;
+      } else {
+        return cartItem.id === item.id;
+      }
+    });
+  
+    if (itemIndex !== -1) {
+      const updatedCart = [...cart];
+      updatedCart[itemIndex] = {
+        ...updatedCart[itemIndex],
+        quantity: updatedCart[itemIndex].quantity + 1,
+      };
+      setCart(updatedCart);
+    } else {
+      const itemWithQuantity = { ...item, quantity: 1 };
+      setCart([...cart, itemWithQuantity]);
+    }
+  
     setIsCartAnimating(true);
-
-    // stop the animation after 1 second
+  
+    // reset the animation after 0.5 second
     setTimeout(() => {
       setIsCartAnimating(false);
-    }, 1000);
-  }
+    }, 500);
+  };
 
   // Remove an item from cart and save to local storage
   const handleRemoveItem = (index) => {
@@ -80,7 +102,7 @@ function App() {
           <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
             <Box sx={{ flex: 1 }}>
               <Header
-                cartCount={cart.length}
+                cartCount={cart.reduce((total, item) => total + item.quantity, 0)}
                 ColorModeContext={ColorModeContext}
                 isCartAnimating={isCartAnimating}
               />
@@ -91,9 +113,20 @@ function App() {
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/search" element={<Search />} />
-                <Route path="/products/:id" element={<Product handleAddToCart={handleAddToCart}/>} />
+                <Route path="/products/:id" element={
+                  <Product
+                    handleAddToCart={handleAddToCart}
+                  />} 
+                />
                 <Route path="/about" element={<About />} />
-                <Route path="/checkout" element={<Checkout cart={cart} handleRemoveItem={handleRemoveItem} mode={mode} />} />
+                <Route path="/checkout" element={
+                  <Checkout
+                    cart={cart}
+                    setCart={setCart}
+                    handleRemoveItem={handleRemoveItem}
+                    mode={mode}
+                  />}
+                />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/payment-complete" element={<PaymentComplete />} />
                 <Route path="*" element={<NoMatch />} />

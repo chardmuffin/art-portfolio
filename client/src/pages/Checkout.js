@@ -11,7 +11,12 @@ import {
   Stepper,
   Step,
   StepLabel,
+  CardActions,
+  CardHeader, 
+  ButtonGroup,
+  Button,
   StepContent,
+  CardMedia,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { toMoneyFormat } from '../utils/helpers';
@@ -19,6 +24,7 @@ import { Link } from 'react-router-dom';
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import axios from 'axios';
+import Sticky from 'react-stickynode';
 
 import StripeCheckoutForm from '../components/StripeCheckoutForm';
 import ShippingAddressForm from '../components/ShippingAddressForm';
@@ -29,7 +35,7 @@ import ConfirmRemoveItemDialog from '../components/ConfirmRemoveItemDialog';
 // This is your test publishable API key.
 const stripePromise = loadStripe("pk_test_51MlxOtIkA32m3k4INfMqyq2Nz6gVgheu3Y7gEqKQgPDnWWj9fRum27YKOnzXScpsrPIkzUD7Hxz7Dy2COGz4nK2Z009J1lob6N");
 
-const Checkout = ({ cart, handleRemoveItem, mode }) => {
+const Checkout = ({ cart, setCart, handleRemoveItem, mode }) => {
 
   // const smallScreen = useMediaQuery('(max-width: 600px)');
   const mediumScreen = useMediaQuery('(max-width: 900px)');
@@ -45,12 +51,27 @@ const Checkout = ({ cart, handleRemoveItem, mode }) => {
     setActiveStep(1);
   };
 
-  // =============================================== process cart =======================================================
+  // ======================================================= process cart ============================================================
 
-  // TODO
-  // consolidate duplicate items (set quantity of each item)
-
-  // populate subtotal panel with calculated amounts
+  // handle change in item quantity
+  const handleQuantityChange = (index, action) => {
+    const newCart = [...cart];
+    const updatedQuantity =
+      action === 'increment'
+        ? newCart[index].quantity + 1
+        : newCart[index].quantity - 1;
+  
+    if (updatedQuantity === 0) {
+      // Set the itemToRemove if the quantity reaches zero
+      // open confirm remove item dialog
+      handleDialogOpen(newCart[index], index);
+      return;
+    }
+  
+    newCart[index].quantity = updatedQuantity;
+    setCart(newCart);
+  };
+  
   // calculate subtotal
   const subtotal = useMemo(() => {
     const calculateSubtotal = () => {
@@ -59,7 +80,7 @@ const Checkout = ({ cart, handleRemoveItem, mode }) => {
         if (item.product_option?.price_difference) {
           price = parseFloat(item.product_option.price_difference) + parseFloat(item.price);
         }
-        return accumulator + price;
+        return accumulator + (price * item.quantity);
       }, 0);
     };
     return calculateSubtotal();
@@ -73,21 +94,24 @@ const Checkout = ({ cart, handleRemoveItem, mode }) => {
   // calculate taxes and shipping costs based on the shipping address
   const calculateTaxesAndShipping = useCallback(() => {
 
-    // Tax rate depending on zip
     // TODO
+    // Sign up for TaxJar - API to calculate sales tax
+    // https://www.taxjar.com/
     const taxRate = 0.1; // 10% tax rate
     const calculatedTax = subtotal * taxRate;
 
-    // Shipping rate depending on zip
     // TODO
+    // sign up for UPS API - calculate shipping, validate address
+    // https://www.ups.com/upsdeveloperkit/downloadresource?loc=en_US
     const calculatedShipping = 10; // $10 fixed shipping cost
+
     setTax(toMoneyFormat(calculatedTax));
     setShipping(toMoneyFormat(calculatedShipping));
     setTotal(toMoneyFormat(subtotal + calculatedTax + calculatedShipping));
   }, [subtotal]);
 
   // ================================================= 3 Panels ==========================================================
-  // subtotal, tax, shipping, total
+  // ================== subtotal, tax, shipping, total ====================
   const subtotalPanelContent = (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -110,7 +134,7 @@ const Checkout = ({ cart, handleRemoveItem, mode }) => {
     </Box>
   );
 
-  // shipping address form (step 1 in mobile)
+  // ====================== shipping address form (step 1 in mobile) =================
   const [shippingInfo, setShippingInfo] = useState({
     name: '',
     addressLine1: '',
@@ -129,23 +153,19 @@ const Checkout = ({ cart, handleRemoveItem, mode }) => {
 
     // if on mobile, go to next step
     mediumScreen && showStep2();
-    
-    console.log(shippingInfo);
   };
 
   const shippingPanelContent = (
     !mediumScreen ? (
       <Card sx={{ boxShadow: 8, borderRadius: '4px' }}>
-        <Box sx={{ m: 2 }}>
-          <Typography variant="h5" component="h5">
-            Shipping Information
-          </Typography>
-          <ShippingAddressForm
-            onAddressSubmit={onAddressSubmit}
-            mediumScreen={mediumScreen}
-            shippingInfo={shippingInfo}
-          />
-        </Box>
+        <CardHeader title='Shipping Information' />
+          <Box sx={{ mx: 2, mb: 2 }}>
+            <ShippingAddressForm
+              onAddressSubmit={onAddressSubmit}
+              mediumScreen={mediumScreen}
+              shippingInfo={shippingInfo}
+            />
+          </Box>
       </Card>
     ) : (
       <>
@@ -165,7 +185,7 @@ const Checkout = ({ cart, handleRemoveItem, mode }) => {
     )
   );
 
-  // ============= stripe panel ===============
+  // ============================= stripe payment panel ==================================
   const [clientSecret, setClientSecret] = useState("");
 
   const createPaymentIntent = async (cart) => {
@@ -216,12 +236,12 @@ const Checkout = ({ cart, handleRemoveItem, mode }) => {
     setOpen(true);
   };
 
-  const handleClose = (isRemoving) => {
+  const handleClose = (isConfirmed) => {
     setOpen(false);
-    isRemoving && handleRemoveItem(itemToRemove.index);
+    isConfirmed && handleRemoveItem(itemToRemove.index);
   };
 
-  // ============================================== jsx =================================================
+  // ============================================== Checkout Page jsx =================================================
   return (
     <Container component={'main'}>
       <Grid container spacing={2}>
@@ -264,16 +284,16 @@ const Checkout = ({ cart, handleRemoveItem, mode }) => {
                     <CloseIcon />
                   </IconButton>
 
-                  <Box component={'img'}
-                    src={`http://localhost:3001/api/products/images/${item.image.id}?width=100&height=150`}
-                    alt={item.name}
-                    loading="lazy"
-                    sx={{
-                      m: 2,
-                      boxShadow: 20,
-                      borderRadius: '2px',
-                    }}
-                  />
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <CardMedia
+                      sx={{ width: 120, boxShadow: 16, borderRadius: "2px", m: 2}}
+                      component="img"
+                      image={`http://localhost:3001/api/products/images/${item.image.id}?width=120`}
+                      title={item.name}
+                    />
+                  </Box>
+                  
+                 
                   <Box sx={{ p: 1, my: 2, width: 1, fontStyle: 'italic', textAlign: 'left', letterSpacing: 2  }}>
                     <Box
                       component={Link}
@@ -306,12 +326,42 @@ const Checkout = ({ cart, handleRemoveItem, mode }) => {
                           {item.product_option.option_3.option_group.name}: {item.product_option.option_3.name}
                         </Typography>
                       }
-                      <Typography variant='subtitle2'>Quantity: 1</Typography>
-                      <Typography variant='subtitle2'>
-                        Price: {toMoneyFormat(item.product_option?.price_difference ?
-                          parseFloat(item.product_option.price_difference) + parseFloat(item.price)
-                          : item.price)}
-                      </Typography>
+                      <Grid container spacing={2}>
+                        <Grid item xs={12} sm={6}>
+                          <Typography variant='subtitle2'>
+                            Price: {toMoneyFormat(item.product_option?.price_difference ?
+                              parseFloat(item.product_option.price_difference) + parseFloat(item.price)
+                              : item.price)}
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            <Typography variant='subtitle2'>Quantity: </Typography>
+                            <CardActions>
+                              <ButtonGroup size="small" aria-label="small outlined button group"
+                                sx={{
+                                  '& .MuiButton-root': {
+                                    p: 0,
+                                    minWidth: '24px',
+                                  }
+                                }}
+                              >
+                                <Button onClick={() => handleQuantityChange(index, 'decrement')}>
+                                  <Typography>–</Typography>
+                                </Button>
+                                <Button disabled>
+                                  <Typography>
+                                    {item.quantity}
+                                  </Typography>
+                                </Button>
+                                <Button onClick={() => handleQuantityChange(index, 'increment')}>
+                                  <Typography>+</Typography>
+                                </Button>
+                              </ButtonGroup>
+                            </CardActions>
+                          </Box>
+                        </Grid>
+                      </Grid>
                     </Box>
                   </Box>
                 </Card>
@@ -330,12 +380,14 @@ const Checkout = ({ cart, handleRemoveItem, mode }) => {
               
             // on desktop/tablet?
             <>
-              <Grid item xs={4} sx={{ position: "sticky", top: "16px" }} >
-                <Card sx={{ boxShadow: 8, borderRadius: '4px' }}>
-                  <Box sx={{ m: 2 }}>
-                    {subtotalPanelContent}
-                  </Box>
-                </Card>
+              <Grid item xs={4}>
+                <Sticky top={16} innerZ={1000}>
+                  <Card sx={{ boxShadow: 8, borderRadius: '4px' }}>
+                    <Box sx={{ m: 2 }}>
+                      {subtotalPanelContent}
+                    </Box>
+                  </Card>
+                </Sticky>
               </Grid>
 
               <Grid item xs={8}>
@@ -344,10 +396,8 @@ const Checkout = ({ cart, handleRemoveItem, mode }) => {
 
               <Grid item xs={8}>
                 <Card sx={{ boxShadow: 8, borderRadius: '4px' }}>
-                  <Typography variant='h5' component='h5' sx={{ m: 2, mb: 0 }}>
-                    Payment Information
-                  </Typography>
-                  <Box sx={{ mx: 2 }}>
+                  <CardHeader title='Payment Information' sx={{ pb: 0 }}/>
+                  <Box sx={{ mx: 2, }}>
                     {paymentPanelContent}
                   </Box>
                 </Card>

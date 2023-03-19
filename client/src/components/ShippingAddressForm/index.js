@@ -167,7 +167,7 @@ const ShippingAddressForm = ({ onAddressSubmit, mediumScreen, shippingInfo }) =>
                 <FormHelperText error>{errors.phone}</FormHelperText>
               ) : null}
             </Grid>
-            <Grid item xs={12} sx={{ textAlign: 'center' }}>
+            <Grid item xs={12} sx={{ textAlign: 'center', mt: 1 }}>
               <Button variant="contained" onClick={handleSubmit}>
                 {!mediumScreen ? "Calculate Tax & Shipping" : "Next"}
               </Button>

@@ -25,7 +25,7 @@ const ConfirmRemoveItemDialog = ({ open, itemToRemove, handleClose }) => {
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose}>Cancel</Button>
+        <Button onClick={() => handleClose(false)}>Cancel</Button>
         <Button variant="outlined" onClick={() => handleClose(true)} autoFocus>
           Ok
         </Button>
