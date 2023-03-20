@@ -35,7 +35,7 @@ import ConfirmRemoveItemDialog from '../components/ConfirmRemoveItemDialog';
 // This is your test publishable API key.
 const stripePromise = loadStripe("pk_test_51MlxOtIkA32m3k4INfMqyq2Nz6gVgheu3Y7gEqKQgPDnWWj9fRum27YKOnzXScpsrPIkzUD7Hxz7Dy2COGz4nK2Z009J1lob6N");
 
-const Checkout = ({ cart, setCart, handleRemoveItem, mode }) => {
+const Checkout = ({ cart, setCart, handleRemoveItem, mode, setOrder }) => {
 
   // const smallScreen = useMediaQuery('(max-width: 600px)');
   const mediumScreen = useMediaQuery('(max-width: 900px)');
@@ -103,7 +103,9 @@ const Checkout = ({ cart, setCart, handleRemoveItem, mode }) => {
     // TODO
     // sign up for UPS API - calculate shipping, validate address
     // https://www.ups.com/upsdeveloperkit/downloadresource?loc=en_US
-    const calculatedShipping = 10; // $10 fixed shipping cost
+    //const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
+    const cartCount = 2;
+    const calculatedShipping = 10 + 10 * (cartCount / 2);
 
     setTax(toMoneyFormat(calculatedTax));
     setShipping(toMoneyFormat(calculatedShipping));
@@ -113,7 +115,7 @@ const Checkout = ({ cart, setCart, handleRemoveItem, mode }) => {
   // ================================================= 3 Panels ==========================================================
   // ================== subtotal, tax, shipping, total ====================
   const subtotalPanelContent = (
-    <Box>
+    <Box sx={{ textAlign: 'center' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
         <Typography variant='h5'>Subtotal:</Typography>
         <Typography variant='h5'>{toMoneyFormat(subtotal)}</Typography>
@@ -126,11 +128,12 @@ const Checkout = ({ cart, setCart, handleRemoveItem, mode }) => {
         <Typography variant='subtitle1'>Shipping:</Typography>
         <Typography variant='subtitle1'>{shipping}</Typography>
       </Box>
-      <Divider />
+      <Divider sx={{ my: 1 }} />
       <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
         <Typography variant='h4'>Total:</Typography>
         <Typography variant='h4'>{total}</Typography>
       </Box>
+      {total === "TBD" && <Typography variant="caption">Enter address for shipping and tax estimate.</Typography>}
     </Box>
   );
 
@@ -151,13 +154,13 @@ const Checkout = ({ cart, setCart, handleRemoveItem, mode }) => {
     calculateTaxesAndShipping();
     formikHelpers.setSubmitting(false);
 
-    // if on mobile, go to next step
-    mediumScreen && showStep2();
+    // go to next step
+    showStep2();
   };
 
   const shippingPanelContent = (
     !mediumScreen ? (
-      <Card sx={{ boxShadow: 8, borderRadius: '4px' }}>
+      <Card sx={{ boxShadow: 8, borderRadius: '4px', mt: 2 }}>
         <CardHeader title='Shipping Information' />
           <Box sx={{ mx: 2, mb: 2 }}>
             <ShippingAddressForm
@@ -168,20 +171,13 @@ const Checkout = ({ cart, setCart, handleRemoveItem, mode }) => {
           </Box>
       </Card>
     ) : (
-      <>
-        <StepLabel onClick={showStep1} sx={{ mb: 0, pt: 0 }}>
-          Shipping Information
-        </StepLabel>
-        <StepContent >
-          <Box sx={{ pt: 1 }}>
-            <ShippingAddressForm
-              onAddressSubmit={onAddressSubmit}
-              mediumScreen={mediumScreen}
-              shippingInfo={shippingInfo}
-            />
-          </Box>
-        </StepContent>
-      </>
+      <Box sx={{ pt: 1 }}>
+        <ShippingAddressForm
+          onAddressSubmit={onAddressSubmit}
+          mediumScreen={mediumScreen}
+          shippingInfo={shippingInfo}
+        />
+      </Box>
     )
   );
 
@@ -190,7 +186,7 @@ const Checkout = ({ cart, setCart, handleRemoveItem, mode }) => {
 
   const createPaymentIntent = async (cart) => {
     try {
-      const response = await axios.post('api/orders/create-payment-intent', cart);
+      const response = await axios.post('api/orders/create-payment-intent', { cart });
       return response.data;
     } catch (error) {
       console.error('Error creating payment intent:', error);
@@ -216,7 +212,12 @@ const Checkout = ({ cart, setCart, handleRemoveItem, mode }) => {
   const paymentPanelContent = (
     clientSecret && (
       <Elements options={options} stripe={stripePromise}>
-        <StripeCheckoutForm handleBack={showStep1}/>
+        <StripeCheckoutForm
+          handleBack={showStep1}
+          shippingInfo={shippingInfo}
+          setOrder={setOrder}
+          cart={cart}
+        />
       </Elements>
     )
   );
@@ -292,8 +293,7 @@ const Checkout = ({ cart, setCart, handleRemoveItem, mode }) => {
                       title={item.name}
                     />
                   </Box>
-                  
-                 
+                              
                   <Box sx={{ p: 1, my: 2, width: 1, fontStyle: 'italic', textAlign: 'left', letterSpacing: 2  }}>
                     <Box
                       component={Link}
@@ -391,30 +391,43 @@ const Checkout = ({ cart, setCart, handleRemoveItem, mode }) => {
               </Grid>
 
               <Grid item xs={8}>
-                {shippingPanelContent}
-              </Grid>
+                <Stepper activeStep={activeStep}>
+                  <Step>
+                    {/* If looking at step 2, step 1 label becomes a link back to step 1 */}
+                    <StepLabel onClick={showStep1} sx={{ '&:hover': { textDecoration: activeStep === 1 ? "underline" : "none" } }}>Shipping Information</StepLabel>
+                  </Step>
+                  <Step>
+                    <StepLabel>Payment</StepLabel>
+                  </Step>
+                </Stepper>
+          
+                {activeStep === 0 && shippingPanelContent }
 
-              <Grid item xs={8}>
-                <Card sx={{ boxShadow: 8, borderRadius: '4px' }}>
-                  <CardHeader title='Payment Information' sx={{ pb: 0 }}/>
-                  <Box sx={{ mx: 2, }}>
-                    {paymentPanelContent}
-                  </Box>
-                </Card>
+                {activeStep === 1 &&              
+                  <Card sx={{ boxShadow: 8, borderRadius: '4px', mt: 2 }}>
+                    <CardHeader title='Payment Information' sx={{ pb: 0 }}/>
+                    <Box sx={{ mx: 2, }}>
+                      {paymentPanelContent}
+                    </Box>
+                  </Card>
+                }
               </Grid>
             </>
           ) : (
             
             // else on mobile/small screen
-            <>
-              <Grid item xs={12}>
-                {subtotalPanelContent}
-              </Grid>
+            <Grid item xs={12}>
+              {subtotalPanelContent}
 
-              <Stepper activeStep={activeStep} orientation='vertical' sx={{ m: 2 }}>
+              <Stepper activeStep={activeStep} orientation='vertical'>
 
                 <Step sx={{ mt: 2 }}>
-                  {shippingPanelContent}
+                  <StepLabel onClick={showStep1} sx={{ mb: 0, pt: 0 }}>
+                    Shipping Information
+                  </StepLabel>
+                  <StepContent>
+                    {shippingPanelContent}
+                  </StepContent>
                 </Step>
                 
                 <Step>
@@ -427,7 +440,7 @@ const Checkout = ({ cart, setCart, handleRemoveItem, mode }) => {
                 </Step>
 
               </Stepper>
-            </>
+            </Grid>
           )}
 
           {/* 3. Confirm remove item dialog popup */}

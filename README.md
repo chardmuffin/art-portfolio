@@ -9,6 +9,9 @@ Axios
 react
 react-query
 react-router
+formik
+yup
+react-stickynode
 
 nodeJS
 bcrypt

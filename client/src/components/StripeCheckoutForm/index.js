@@ -7,7 +7,7 @@ import {
 import { Button } from "@mui/material";
 import { Box, Typography, CircularProgress } from "@mui/material";
 
-const StripeCheckoutForm = ({ handleBack }) => {
+const StripeCheckoutForm = ({ handleBack, shippingInfo, setOrder, cart }) => {
   const stripe = useStripe();
   const elements = useElements();
 
@@ -56,11 +56,18 @@ const StripeCheckoutForm = ({ handleBack }) => {
 
     setIsLoading(true);
 
+    // Create the order object
+    setOrder({
+      purchasedItems: cart,
+      shippingInfo: shippingInfo,
+      orderDate: new Date().toISOString(),
+    });
+
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
         // Make sure to change this to your payment completion page
-        return_url: "http://localhost:3000/payment-complete",
+        return_url: "http://localhost:3000/payment-complete"
       },
     });
 
@@ -88,7 +95,7 @@ const StripeCheckoutForm = ({ handleBack }) => {
         <PaymentElement options={paymentElementOptions} />
       </Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-around', mb: 2 }}>
-        <Button variant="contained" onClick={handleBack} sx={{ display: { md: 'none' } }}>
+        <Button variant="contained" onClick={handleBack} >
           <Typography variant='button'>Back</Typography>
         </Button>
         <Button
@@ -99,7 +106,7 @@ const StripeCheckoutForm = ({ handleBack }) => {
           onClick={handleSubmit}
         >
           {isLoading ? (
-            <CircularProgress />
+            <CircularProgress size={20} />
           ) : (
             <Typography variant='button'>Place Order</Typography>
           )}

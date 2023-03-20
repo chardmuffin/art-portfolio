@@ -56,30 +56,35 @@ const stripe = require("stripe")(process.env.STRIPE_SK_TEST)
 // Calculate the order total on the server to prevent
 // people from directly manipulating the amount on the client
 // TODO
-const calculateOrderAmount = (items) => {
+const calculateOrderAmount = (cart) => {
 
-  console.log(items)
+  console.log(cart)
+  // calculate subtotal
+  const calculateSubtotal = () => {
+    return cart.reduce((accumulator, item) => {
+      let price = parseFloat(item.price);
+      if (item.product_option?.price_difference) {
+        price = parseFloat(item.product_option.price_difference) + parseFloat(item.price);
+      }
+      return accumulator + (price * item.quantity);
+    }, 0);
+  };
+  const subtotal = calculateSubtotal();
 
-  // subtotal TODO
-  const subtotal = 100;
-  // const subtotal = items.reduce((accumulator, item) => {
-  //   let price = parseFloat(item.price);
-  //   if (item.product_option?.price_difference) {
-  //     price = parseFloat(item.product_option.price_difference) + parseFloat(item.price);
-  //   }
-  //   return accumulator + price;
-  // }, 0);
+  // TODO
+  // Sign up for TaxJar - API to calculate sales tax
+  // https://www.taxjar.com/
+  const taxRate = 0.1; // 10% tax rate
+  const calculatedTax = subtotal * taxRate;
 
-  // tax TODO
-  const tax = 0;
+  // TODO
+  // sign up for UPS API - calculate shipping, validate address
+  // https://www.ups.com/upsdeveloperkit/downloadresource?loc=en_US
+  const calculatedShipping = 10; // $10 fixed shipping cost
 
-  // shipping TODO
-  const shipping = 0;
+  const total = subtotal + calculatedTax + calculatedShipping
 
-  // discounts TODO
-  const discounts = 0;
-
-  return subtotal + tax + shipping + discounts;
+  return parseFloat(total);
 };
 
 router.post("/create-payment-intent", async (req, res) => {

@@ -6,8 +6,8 @@ import {
   TextField,
   Grid,
   Button,
-  Box,
-  FormHelperText
+  FormHelperText,
+  Typography
 } from '@mui/material';
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
@@ -92,7 +92,7 @@ const ShippingAddressSchema = Yup.object().shape({
     )
 });
 
-const ShippingAddressForm = ({ onAddressSubmit, mediumScreen, shippingInfo }) => {
+const ShippingAddressForm = ({ onAddressSubmit, shippingInfo }) => {
 
   return (
     <Formik
@@ -169,7 +169,7 @@ const ShippingAddressForm = ({ onAddressSubmit, mediumScreen, shippingInfo }) =>
             </Grid>
             <Grid item xs={12} sx={{ textAlign: 'center', mt: 1 }}>
               <Button variant="contained" onClick={handleSubmit}>
-                {!mediumScreen ? "Calculate Tax & Shipping" : "Next"}
+                <Typography variant='button'>Next</Typography>
               </Button>
             </Grid>
           </Grid>

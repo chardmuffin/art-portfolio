@@ -92,6 +92,13 @@ function App() {
     setCart(cart.slice(0, index).concat(cart.slice(index + 1)));
   }
 
+  // Order processing
+  const [order, setOrder] = usePersistentState("RHArt-order", {
+    purchasedItems: [],
+    shippingInfo: {},
+    orderDate: null,
+  });
+
   return (
     <Router>
       <ScrollToTop />
@@ -125,10 +132,16 @@ function App() {
                     setCart={setCart}
                     handleRemoveItem={handleRemoveItem}
                     mode={mode}
+                    setOrder={setOrder}
                   />}
                 />
                 <Route path="/contact" element={<Contact />} />
-                <Route path="/payment-complete" element={<PaymentComplete />} />
+                <Route path="/payment-complete" element={
+                  <PaymentComplete
+                    setCart={setCart}
+                    order={order}
+                  />}
+                />
                 <Route path="*" element={<NoMatch />} />
               </Routes>
             </Box>

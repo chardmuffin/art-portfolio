@@ -16,17 +16,17 @@ const ProductList = ({ products, title }) => {
   const width = 300;
   const height = 350;
 
-  const marginX = smallScreen ? 'auto' : mediumScreen ? 8 : 6; // Set margin for two columns
+  // const marginX = smallScreen ? 'auto' : mediumScreen ? 8 : 6; // Set margin for two columns
 
   return (
     <Box sx={{ mx: 'auto', my: 2 }}>
       <Typography variant='h6' sx={{ my: 2 }}>
         {title}
       </Typography>
-        <ImageList variant="masonry" cols={cols} gap={18} sx={{ mx: marginX }}>
+        <ImageList variant="masonry" cols={cols} gap={12} >
           {products &&
             products.map((product) => (
-              <ImageListItem key={product.id} sx={{ textAlign: 'center', overflow: 'hidden', p: 2 }}>
+              <ImageListItem key={product.id} sx={{ textAlign: 'center', p: 2 }}>
                 <Link to={`/products/${product.id}`}>
                   <Box component={'img'}
                     src={`http://localhost:3001/api/products/images/${product.image.id}?width=${width}&height=${height}`}
