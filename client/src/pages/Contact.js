@@ -74,8 +74,8 @@ const Contact = () => {
               <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}>
                 {({ touched, errors }) => (
                   <Form>
-                    <Grid container spacing={2}>
-                      <Grid item xs={12}>
+                    <Grid container spacing={2} justifyContent='center' >
+                      <Grid item xs={10} md={8}>
                         <Field
                           as={TextField}
                           fullWidth
@@ -86,7 +86,7 @@ const Contact = () => {
                           helperText={touched.name && errors.name}
                         />
                       </Grid>
-                      <Grid item xs={12}>
+                      <Grid item xs={10} md={8}>
                         <Field
                           as={TextField}
                           fullWidth
@@ -97,7 +97,7 @@ const Contact = () => {
                           helperText={touched.subject && errors.subject}
                         />
                       </Grid>
-                      <Grid item xs={12}>
+                      <Grid item xs={10} md={8}>
                         <Field
                           as={TextField}
                           fullWidth
@@ -110,27 +110,32 @@ const Contact = () => {
                           helperText={touched.message && errors.message}
                         />
                       </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <Field
-                          as={TextField}
-                          fullWidth
-                          label="Email"
-                          name="email"
-                          variant="outlined"
-                          error={touched.email && !!errors.email}
-                          helperText={touched.email && errors.email}
-                        />
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <Field
-                          as={TextField}
-                          fullWidth
-                          label="Phone"
-                          name="phone"
-                          variant="outlined"
-                          error={touched.phone && !!errors.phone}
-                          helperText={touched.phone && errors.phone}
-                        />
+                      <Grid item xs={10} md={8}>
+                        <Grid container spacing={2} justifyContent='space-between'>
+                          <Grid item xs={12} sm={6}>
+                            <Field
+                              as={TextField}
+                              fullWidth
+                              label="Email"
+                              name="email"
+                              variant="outlined"
+                              error={touched.email && !!errors.email}
+                              helperText={touched.email && errors.email}
+                            />
+                          </Grid>
+                          <Grid item xs={12} sm={6}>
+                            <Field
+                              as={TextField}
+                              fullWidth
+                              label="Phone"
+                              name="phone"
+                              variant="outlined"
+                              error={touched.phone && !!errors.phone}
+                              helperText={touched.phone && errors.phone}
+                            />
+                          </Grid>
+                        </Grid>
+                        
                       </Grid>
                       <Grid item xs={12}>
                         <Button type="submit" variant="contained" color="primary" fullWidth>

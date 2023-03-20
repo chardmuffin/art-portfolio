@@ -113,30 +113,6 @@ const Checkout = ({ cart, setCart, handleRemoveItem, mode, setOrder }) => {
   }, [subtotal]);
 
   // ================================================= 3 Panels ==========================================================
-  // ================== subtotal, tax, shipping, total ====================
-  const subtotalPanelContent = (
-    <Box sx={{ textAlign: 'center' }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-        <Typography variant='h5'>Subtotal:</Typography>
-        <Typography variant='h5'>{toMoneyFormat(subtotal)}</Typography>
-      </Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-        <Typography variant='subtitle1'>Tax:</Typography>
-        <Typography variant='subtitle1'>{tax}</Typography>
-      </Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-        <Typography variant='subtitle1'>Shipping:</Typography>
-        <Typography variant='subtitle1'>{shipping}</Typography>
-      </Box>
-      <Divider sx={{ my: 1 }} />
-      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-        <Typography variant='h4'>Total:</Typography>
-        <Typography variant='h4'>{total}</Typography>
-      </Box>
-      {total === "TBD" && <Typography variant="caption">Enter address for shipping and tax estimate.</Typography>}
-    </Box>
-  );
-
   // ====================== shipping address form (step 1 in mobile) =================
   const [shippingInfo, setShippingInfo] = useState({
     name: '',
@@ -185,19 +161,22 @@ const Checkout = ({ cart, setCart, handleRemoveItem, mode, setOrder }) => {
   const [clientSecret, setClientSecret] = useState("");
 
   const createPaymentIntent = async (cart) => {
-    try {
-      const response = await axios.post('api/orders/create-payment-intent', { cart });
-      return response.data;
-    } catch (error) {
-      console.error('Error creating payment intent:', error);
-      throw error;
+    if (cart.length > 0) {
+      try {
+        const response = await axios.post('api/orders/create-payment-intent', { cart });
+        return response.data;
+      } catch (error) {
+        console.error('Error creating payment intent:', error);
+        throw error;
+      }
     }
   };
 
   useEffect(() => {
-    createPaymentIntent(cart)
-      .then((data) => setClientSecret(data.clientSecret))
-      .catch((error) => console.error('Error setting client secret:', error));
+    cart.length > 0 &&
+      createPaymentIntent(cart)
+        .then((data) => setClientSecret(data.clientSecret))
+        .catch((error) => console.error('Error setting client secret:', error));
   }, [cart]);
 
   const appearance = {
@@ -220,6 +199,35 @@ const Checkout = ({ cart, setCart, handleRemoveItem, mode, setOrder }) => {
         />
       </Elements>
     )
+  );
+
+  // ================== subtotal, tax, shipping, total panel ====================
+  // recalculate each time shipping info or subtotal changes (subtotal updates as cart updates)
+  useEffect(() => {
+    shippingInfo.name !== '' && calculateTaxesAndShipping();
+  }, [subtotal, shippingInfo, calculateTaxesAndShipping]);
+
+  const subtotalPanelContent = (
+    <Box sx={{ textAlign: 'center' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Typography variant='h5'>Subtotal:</Typography>
+        <Typography variant='h5'>{toMoneyFormat(subtotal)}</Typography>
+      </Box>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Typography variant='subtitle1'>Tax:</Typography>
+        <Typography variant='subtitle1'>{tax}</Typography>
+      </Box>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Typography variant='subtitle1'>Shipping:</Typography>
+        <Typography variant='subtitle1'>{shipping}</Typography>
+      </Box>
+      <Divider sx={{ my: 1 }} />
+      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Typography variant='h4'>Total:</Typography>
+        <Typography variant='h4'>{total}</Typography>
+      </Box>
+      {total === "TBD" && <Typography variant="caption">Enter address for shipping and tax estimate.</Typography>}
+    </Box>
   );
 
   // ============================= remove item from cart confirmation dialog ==================================

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useMutation } from 'react-query';
-import { Container, TextField, Button } from '@mui/material';
+import { Container, TextField, Button, Grid, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 const Login = (props) => {
@@ -53,37 +53,43 @@ const Login = (props) => {
 
   return (
     <Container component={'main'}>
-      <Container component={'main'}>
-      <form onSubmit={handleFormSubmit}>
-        <TextField
-          id="email"
-          label="Email"
-          variant="outlined"
-          name="email"
-          type="email"
-          value={formState.email}
-          onChange={handleChange}
-          margin="normal"
-          required
-          fullWidth
-        />
-        <TextField
-          id="password"
-          label="Password"
-          variant="outlined"
-          name="password"
-          type="password"
-          value={formState.password}
-          onChange={handleChange}
-          margin="normal"
-          required
-          fullWidth
-        />
-        <Button variant="contained" color="primary" type="submit">
-          Login
-        </Button>
-      </form>
-    </Container>
+      <Grid container sx={{ textAlign: 'center', justifyContent: 'center', my: 4 }}>
+        <Grid item xs={12} sm={8} md={6}>
+          <Typography variant='h5' >
+            Admin Login
+          </Typography>
+          <form onSubmit={handleFormSubmit}>
+            <TextField
+              id="email"
+              label="Email"
+              variant="outlined"
+              name="email"
+              type="email"
+              value={formState.email}
+              onChange={handleChange}
+              margin="normal"
+              required
+              fullWidth
+            />
+            <TextField
+              id="password"
+              label="Password"
+              variant="outlined"
+              name="password"
+              type="password"
+              value={formState.password}
+              onChange={handleChange}
+              margin="normal"
+              required
+              fullWidth
+            />
+            <Button variant="contained" color="primary" type="submit">
+              Login
+            </Button>
+          </form>
+        </Grid>
+      </Grid>
+      
     </Container>
   );
 };

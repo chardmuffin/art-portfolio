@@ -16,8 +16,6 @@ const ProductList = ({ products, title, titleVariant }) => {
   const width = 300;
   const height = 350;
 
-  console.log(products)
-
   return (
     <Box sx={{ mx: 'auto', my: 2 }}>
       <Typography variant={titleVariant ? titleVariant : 'h6'} sx={{ m: 2 }}>

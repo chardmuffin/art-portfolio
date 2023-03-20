@@ -58,7 +58,6 @@ const stripe = require("stripe")(process.env.STRIPE_SK_TEST)
 // TODO
 const calculateOrderAmount = (cart) => {
 
-  console.log(cart)
   // calculate subtotal
   const calculateSubtotal = () => {
     return cart.reduce((accumulator, item) => {

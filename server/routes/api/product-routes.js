@@ -280,7 +280,7 @@ router.post('/', withAuth, (req, res) => {
     image_id: 1                                                                               // optional
   }   
 */
-router.put('/:id', (req, res) => {
+router.put('/:id', withAuth, (req, res) => {
   // update product data
   Product.update(req.body, {
     where: {
