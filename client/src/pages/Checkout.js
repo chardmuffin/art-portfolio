@@ -252,205 +252,205 @@ const Checkout = ({ cart, setCart, handleRemoveItem, mode, setOrder }) => {
           </Typography>
         </Grid>
       
-      {cart.length === 0 ? (
-        // the cart is empty ?
-        <Grid item xs={12}>
-          <Typography sx={{ my: 2, textAlign: 'center' }}>
-            Cart is empty!
-          </Typography>
-        </Grid>
-        
-      ) : (
-        // if cart is not empty
-        // 1. iterate thru cart, displaying items...
-        <>
-          <Grid item xs={12} md={8}>
-            {cart.map((item, index) => {
-              return (
-                <Card key={index}
-                  sx={{
-                    mx: 'auto',
-                    mb: 2,
-                    textAlign: 'left',
-                    display: 'flex',
-                    boxShadow: 8,
-                    borderRadius: '2px',
-                    position: 'relative'
-                  }}
-                >
-                  <IconButton
-                    aria-label="remove item"
-                    onClick={() => handleDialogOpen(item, index)}
-                    sx={{ position: 'absolute', top: '0px', right: '0px' }}>
-                    <CloseIcon />
-                  </IconButton>
-
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <CardMedia
-                      sx={{ width: 120, boxShadow: 16, borderRadius: "2px", m: 2}}
-                      component="img"
-                      image={`http://localhost:3001/api/products/images/${item.image.id}?width=120`}
-                      title={item.name}
-                    />
-                  </Box>
-                              
-                  <Box sx={{ p: 1, my: 2, width: 1, fontStyle: 'italic', textAlign: 'left', letterSpacing: 2  }}>
-                    <Box
-                      component={Link}
-                      to={`/products/${item.id}`}
-                      sx={{
-                        color: 'inherit',
-                        textDecoration: 'none',
-                        '&:hover': {
-                          textDecoration: 'underline'
-                        }
-                      }}
-                    >
-                      <Typography variant='h5' component="h3" >
-                        {item.name}
-                      </Typography>
-                    </Box>
-                    <Box sx={{ mx: 2 }}>
-                      {item.product_option?.option_1 &&
-                        <Typography variant='subtitle2'>
-                          {item.product_option.option_1.option_group.name}: {item.product_option.option_1.name}
-                        </Typography>
-                      }
-                      {item.product_option?.option_2 &&
-                        <Typography variant='subtitle2'>
-                          {item.product_option.option_2.option_group.name}: {item.product_option.option_2.name}
-                        </Typography>
-                      }
-                      {item.product_option?.option_3 &&
-                        <Typography variant='subtitle2'>
-                          {item.product_option.option_3.option_group.name}: {item.product_option.option_3.name}
-                        </Typography>
-                      }
-                      <Grid container spacing={2}>
-                        <Grid item xs={12} sm={6}>
-                          <Typography variant='subtitle2'>
-                            Price: {toMoneyFormat(item.product_option?.price_difference ?
-                              parseFloat(item.product_option.price_difference) + parseFloat(item.price)
-                              : item.price)}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                            <Typography variant='subtitle2'>Quantity: </Typography>
-                            <CardActions>
-                              <ButtonGroup size="small" aria-label="small outlined button group"
-                                sx={{
-                                  '& .MuiButton-root': {
-                                    p: 0,
-                                    minWidth: '24px',
-                                  }
-                                }}
-                              >
-                                <Button onClick={() => handleQuantityChange(index, 'decrement')}>
-                                  <Typography>–</Typography>
-                                </Button>
-                                <Button disabled>
-                                  <Typography>
-                                    {item.quantity}
-                                  </Typography>
-                                </Button>
-                                <Button onClick={() => handleQuantityChange(index, 'increment')}>
-                                  <Typography>+</Typography>
-                                </Button>
-                              </ButtonGroup>
-                            </CardActions>
-                          </Box>
-                        </Grid>
-                      </Grid>
-                    </Box>
-                  </Box>
-                </Card>
-              )
-            })}
+        {cart.length === 0 ? (
+          // the cart is empty ?
+          <Grid item xs={12}>
+            <Typography sx={{ my: 2, textAlign: 'center' }}>
+              Cart is empty!
+            </Typography>
           </Grid>
-
-          {/*
-              2. show 3 panels:
-                - 1 with subtotal, tax, shipping, total
-                - 1 with shipping address form
-                - 1 with stripe payment information form
-              mobile will tap label or button to step between shipping address and stripe payment form
-            */}
-          {!mediumScreen ? (
-              
-            // on desktop/tablet?
-            <>
-              <Grid item xs={4}>
-                <Sticky top={16} innerZ={1000}>
-                  <Card sx={{ boxShadow: 8, borderRadius: '4px' }}>
-                    <Box sx={{ m: 2 }}>
-                      {subtotalPanelContent}
-                    </Box>
-                  </Card>
-                </Sticky>
-              </Grid>
-
-              <Grid item xs={8}>
-                <Stepper activeStep={activeStep}>
-                  <Step>
-                    {/* If looking at step 2, step 1 label becomes a link back to step 1 */}
-                    <StepLabel onClick={showStep1} sx={{ '&:hover': { textDecoration: activeStep === 1 ? "underline" : "none" } }}>Shipping Information</StepLabel>
-                  </Step>
-                  <Step>
-                    <StepLabel>Payment</StepLabel>
-                  </Step>
-                </Stepper>
           
-                {activeStep === 0 && shippingPanelContent }
+        ) : (
+          // if cart is not empty
+          // 1. iterate thru cart, displaying items...
+          <>
+            <Grid item xs={12} md={8}>
+              {cart.map((item, index) => {
+                return (
+                  <Card key={index}
+                    sx={{
+                      mx: 'auto',
+                      mb: 2,
+                      textAlign: 'left',
+                      display: 'flex',
+                      boxShadow: 8,
+                      borderRadius: '2px',
+                      position: 'relative'
+                    }}
+                  >
+                    <IconButton
+                      aria-label="remove item"
+                      onClick={() => handleDialogOpen(item, index)}
+                      sx={{ position: 'absolute', top: '0px', right: '0px' }}>
+                      <CloseIcon />
+                    </IconButton>
 
-                {activeStep === 1 &&              
-                  <Card sx={{ boxShadow: 8, borderRadius: '4px', mt: 2 }}>
-                    <CardHeader title='Payment Information' sx={{ pb: 0 }}/>
-                    <Box sx={{ mx: 2, }}>
-                      {paymentPanelContent}
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      <CardMedia
+                        sx={{ width: 120, boxShadow: 16, borderRadius: "2px", m: 2}}
+                        component="img"
+                        image={`http://localhost:3001/api/products/images/${item.image.id}?width=120`}
+                        title={item.name}
+                      />
+                    </Box>
+                                
+                    <Box sx={{ p: 1, my: 2, width: 1, fontStyle: 'italic', textAlign: 'left', letterSpacing: 2  }}>
+                      <Box
+                        component={Link}
+                        to={`/products/${item.id}`}
+                        sx={{
+                          color: 'inherit',
+                          textDecoration: 'none',
+                          '&:hover': {
+                            textDecoration: 'underline'
+                          }
+                        }}
+                      >
+                        <Typography variant='h5' component="h3" >
+                          {item.name}
+                        </Typography>
+                      </Box>
+                      <Box sx={{ mx: 2 }}>
+                        {item.product_option?.option_1 &&
+                          <Typography variant='subtitle2'>
+                            {item.product_option.option_1.option_group.name}: {item.product_option.option_1.name}
+                          </Typography>
+                        }
+                        {item.product_option?.option_2 &&
+                          <Typography variant='subtitle2'>
+                            {item.product_option.option_2.option_group.name}: {item.product_option.option_2.name}
+                          </Typography>
+                        }
+                        {item.product_option?.option_3 &&
+                          <Typography variant='subtitle2'>
+                            {item.product_option.option_3.option_group.name}: {item.product_option.option_3.name}
+                          </Typography>
+                        }
+                        <Grid container spacing={2}>
+                          <Grid item xs={12} sm={6}>
+                            <Typography variant='subtitle2'>
+                              Price: {toMoneyFormat(item.product_option?.price_difference ?
+                                parseFloat(item.product_option.price_difference) + parseFloat(item.price)
+                                : item.price)}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={12} sm={6}>
+                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                              <Typography variant='subtitle2'>Quantity: </Typography>
+                              <CardActions>
+                                <ButtonGroup size="small" aria-label="small outlined button group"
+                                  sx={{
+                                    '& .MuiButton-root': {
+                                      p: 0,
+                                      minWidth: '24px',
+                                    }
+                                  }}
+                                >
+                                  <Button onClick={() => handleQuantityChange(index, 'decrement')}>
+                                    <Typography>–</Typography>
+                                  </Button>
+                                  <Button disabled>
+                                    <Typography>
+                                      {item.quantity}
+                                    </Typography>
+                                  </Button>
+                                  <Button onClick={() => handleQuantityChange(index, 'increment')}>
+                                    <Typography>+</Typography>
+                                  </Button>
+                                </ButtonGroup>
+                              </CardActions>
+                            </Box>
+                          </Grid>
+                        </Grid>
+                      </Box>
                     </Box>
                   </Card>
-                }
-              </Grid>
-            </>
-          ) : (
-            
-            // else on mobile/small screen
-            <Grid item xs={12}>
-              {subtotalPanelContent}
-
-              <Stepper activeStep={activeStep} orientation='vertical'>
-
-                <Step sx={{ mt: 2 }}>
-                  <StepLabel onClick={showStep1} sx={{ mb: 0, pt: 0 }}>
-                    Shipping Information
-                  </StepLabel>
-                  <StepContent>
-                    {shippingPanelContent}
-                  </StepContent>
-                </Step>
-                
-                <Step>
-                  <StepLabel sx={{ pb: 0, }}>
-                    Payment Information
-                  </StepLabel>
-                  <StepContent>
-                    {paymentPanelContent}
-                  </StepContent>
-                </Step>
-
-              </Stepper>
+                )
+              })}
             </Grid>
-          )}
 
-          {/* 3. Confirm remove item dialog popup */}
-          <ConfirmRemoveItemDialog
-            open={open}
-            handleClose={handleClose}
-            itemToRemove={itemToRemove}
-          />
-        </>
-      )}
+            {/*
+                2. show 3 panels:
+                  - 1 with subtotal, tax, shipping, total
+                  - 1 with shipping address form
+                  - 1 with stripe payment information form
+                mobile will tap label or button to step between shipping address and stripe payment form
+              */}
+            {!mediumScreen ? (
+                
+              // on desktop/tablet?
+              <>
+                <Grid item xs={4}>
+                  <Sticky top={16} innerZ={1000}>
+                    <Card sx={{ boxShadow: 8, borderRadius: '4px' }}>
+                      <Box sx={{ m: 2 }}>
+                        {subtotalPanelContent}
+                      </Box>
+                    </Card>
+                  </Sticky>
+                </Grid>
+
+                <Grid item xs={8}>
+                  <Stepper activeStep={activeStep}>
+                    <Step>
+                      {/* If looking at step 2, step 1 label becomes a link back to step 1 */}
+                      <StepLabel onClick={showStep1} sx={{ '&:hover': { textDecoration: activeStep === 1 ? "underline" : "none" } }}>Shipping Information</StepLabel>
+                    </Step>
+                    <Step>
+                      <StepLabel>Payment</StepLabel>
+                    </Step>
+                  </Stepper>
+            
+                  {activeStep === 0 && shippingPanelContent }
+
+                  {activeStep === 1 &&              
+                    <Card sx={{ boxShadow: 8, borderRadius: '4px', mt: 2 }}>
+                      <CardHeader title='Payment Information' sx={{ pb: 0 }}/>
+                      <Box sx={{ mx: 2, }}>
+                        {paymentPanelContent}
+                      </Box>
+                    </Card>
+                  }
+                </Grid>
+              </>
+            ) : (
+              
+              // else on mobile/small screen
+              <Grid item xs={12}>
+                {subtotalPanelContent}
+
+                <Stepper activeStep={activeStep} orientation='vertical'>
+
+                  <Step sx={{ mt: 2 }}>
+                    <StepLabel onClick={showStep1} sx={{ mb: 0, pt: 0 }}>
+                      Shipping Information
+                    </StepLabel>
+                    <StepContent>
+                      {shippingPanelContent}
+                    </StepContent>
+                  </Step>
+                  
+                  <Step>
+                    <StepLabel sx={{ pb: 0, }}>
+                      Payment Information
+                    </StepLabel>
+                    <StepContent>
+                      {paymentPanelContent}
+                    </StepContent>
+                  </Step>
+
+                </Stepper>
+              </Grid>
+            )}
+
+            {/* 3. Confirm remove item dialog popup */}
+            <ConfirmRemoveItemDialog
+              open={open}
+              handleClose={handleClose}
+              itemToRemove={itemToRemove}
+            />
+          </>
+        )}
 
       </Grid>
     </Container>

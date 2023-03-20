@@ -2,7 +2,7 @@ import React from 'react';
 import ProductList from '../components/ProductList';
 import axios from 'axios';
 import { useQuery } from 'react-query';
-import { Container, CircularProgress } from '@mui/material';
+import { Container, CircularProgress, Grid } from '@mui/material';
 
 const Home = () => {
   const { isLoading, isError, data, error } = useQuery('products', () =>
@@ -22,7 +22,12 @@ const Home = () => {
 
   return (
     <Container component={'main'}>
-      {data && <ProductList products={data} title="Artwork for purchase" />}
+      <Grid container spacing={2} justifyContent="center" sx={{ my: 4 }}>
+        <Grid item xs={11} md={10}>
+          {data && <ProductList products={data} title="Artwork for purchase" titleVariant='h4' />}
+        </Grid>
+      </Grid>
+      
     </Container>
   );
 };

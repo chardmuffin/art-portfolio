@@ -12,6 +12,7 @@ react-router
 formik
 yup
 react-stickynode
+emailjs
 
 nodeJS
 bcrypt

@@ -14,7 +14,9 @@ import {
   Select,
   InputAdornment,
   MenuItem,
-  CircularProgress
+  CircularProgress,
+  Typography,
+  Grid
 } from '@mui/material';
 
 const Search = () => {
@@ -61,59 +63,71 @@ const Search = () => {
 
   return (
     <Container component={'main'}>
-      <h3>Search Portfolio</h3>
-      <FormControl fullWidth>
-        <TextField
-          value={filters.text}
-          label="Search"
-          variant="outlined"
-          onChange={(e) => handleFilterChange('text', e.target.value)}
-          InputProps={{
-            endAdornment: <InputAdornment position="end">🔍</InputAdornment>,
-          }}
-        />
-      </FormControl>
-      <FormGroup sx={{ my: 1 }}>
-        <FormControl variant="outlined">
-        <InputLabel id="category-label">Category</InputLabel>
-          <Select
-            label="Category"
-            value={filters.category}
-            autoWidth
-            onChange={(e) => handleFilterChange('category', e.target.value)}
-          >
-            {categories?.map((category) => (
-              <MenuItem key={category} value={category}>
-                {category==="All" ? <em>All</em> : category}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <FormControlLabel
-          label="Only show products in stock"
-          control={
-            <Checkbox
-              onChange={(e) => handleFilterChange('inStockOnly', e.target.checked)}
+      <Grid container spacing={2} justifyContent="center">
+        <Grid item xs={12}>
+          <Typography variant='h4' component="h3" sx={{ my: 4, textAlign: 'center' }}>
+            Search Portfolio
+          </Typography>
+        </Grid>
+        <Grid item xs={10} sm={8}>
+          <FormControl fullWidth>
+            <TextField
+              value={filters.text}
+              label="Search"
+              variant="outlined"
+              onChange={(e) => handleFilterChange('text', e.target.value)}
+              InputProps={{
+                endAdornment: <InputAdornment position="end">🔍</InputAdornment>,
+              }}
             />
-          }
-          sx={{ my: 2 }}
-        />
-        <InputLabel sx={{ mt: 1 }}>Price Range</InputLabel>
-        <Slider
-          value={filters.priceRange}
-          onChange={(e, newValue) => {
-            handleFilterChange('priceRange', newValue);
-          }}
-          valueLabelDisplay="auto"
-          min={0}
-          max={500}
-          step={10}
-          sx={{maxWidth: '90%', mx: 'auto', mb: 2}}
-        />
-      </FormGroup>
-      {isLoading && <CircularProgress />}
-      {isError && <div>Error: {error?.message ?? 'Unknown error'}</div>}
-      {data && <ProductList products={filteredProducts} title="Results" />}
+          </FormControl>
+          <FormGroup sx={{ my: 1 }}>
+            <FormControl variant="outlined">
+            <InputLabel id="category-label">Category</InputLabel>
+              <Select
+                label="Category"
+                value={filters.category}
+                autoWidth
+                onChange={(e) => handleFilterChange('category', e.target.value)}
+              >
+                {categories?.map((category) => (
+                  <MenuItem key={category} value={category}>
+                    {category==="All" ? <em>All</em> : category}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <FormControlLabel
+              label="Only show products in stock"
+              control={
+                <Checkbox
+                  onChange={(e) => handleFilterChange('inStockOnly', e.target.checked)}
+                />
+              }
+              sx={{ my: 2 }}
+            />
+            <InputLabel sx={{ mt: 1 }}>Price Range</InputLabel>
+            <Slider
+              value={filters.priceRange}
+              onChange={(e, newValue) => {
+                handleFilterChange('priceRange', newValue);
+              }}
+              valueLabelDisplay="auto"
+              min={0}
+              max={500}
+              step={10}
+              sx={{maxWidth: '90%', mx: 'auto', mb: 2}}
+            />
+          </FormGroup>
+        </Grid>
+        
+        {isLoading && <CircularProgress />}
+        {isError && <div>Error: {error?.message ?? 'Unknown error'}</div>}
+        <Grid item xs={11} md={10}>
+          {data && <ProductList products={filteredProducts} title="Results"/>}
+        </Grid>
+        
+      </Grid>
     </Container>
   );
 };
