@@ -13,7 +13,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import NoMatch from './pages/NoMatch';
 import Profile from './pages/Profile';
-import Signup from './pages/Signup';
+// import Signup from './pages/Signup';
 import Search from './pages/Search';
 import Checkout from './pages/Checkout';
 import About from './pages/About';
@@ -117,7 +117,7 @@ function App() {
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<Signup />} />
+                {/* <Route path="/signup" element={<Signup />} /> */}
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/search" element={<Search />} />
                 <Route path="/products/:id" element={

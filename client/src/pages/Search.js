@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import ProductList from '../components/ProductList';
-import axios from 'axios';
+import axios from '../utils/axiosConfig';
 import { useQuery } from 'react-query';
 import {
   Container,
@@ -16,12 +16,21 @@ import {
   MenuItem,
   CircularProgress,
   Typography,
-  Grid
+  Grid,
+  Card,
+  useMediaQuery,
+  Divider,
+  CardHeader,
+  Box
 } from '@mui/material';
 
 const Search = () => {
+
+  const smallScreen = useMediaQuery('(max-width: 600px)');
+  //const mediumScreen = useMediaQuery('(max-width: 900px)');
+
   const { isLoading, isError, data, error } = useQuery('products', () =>
-    axios('http://localhost:3001/api/products', {
+    axios(`/api/products`, {
       responseType: 'json',
     }).then((response) => response.data)
   );
@@ -61,33 +70,47 @@ const Search = () => {
 
   const categories = ['All', ...new Set(data?.map((product) => product.category.name))];
 
+  const ConditionalWrapper = ({ condition, wrapper, children }) => 
+    condition ? wrapper(children) : children;
+
   return (
     <Container component={'main'}>
       <Grid container spacing={2} justifyContent="center">
-        <Grid item xs={12}>
-          <Typography variant='h4' component="h3" sx={{ my: 4, textAlign: 'center' }}>
-            Search Portfolio
-          </Typography>
-        </Grid>
-        <Grid item xs={10} sm={8}>
-          <FormControl fullWidth>
-            <TextField
-              value={filters.text}
-              label="Search"
-              variant="outlined"
-              onChange={(e) => handleFilterChange('text', e.target.value)}
-              InputProps={{
-                endAdornment: <InputAdornment position="end">🔍</InputAdornment>,
-              }}
-            />
-          </FormControl>
-          <FormGroup sx={{ my: 1 }}>
-            <FormControl variant="outlined">
-            <InputLabel id="category-label">Category</InputLabel>
+        <Grid item xs={10} sm={8} md={6} sx={{ textAlign: 'center' }}>
+          <ConditionalWrapper
+            condition={!smallScreen}
+            wrapper={children =>
+              <Card sx={{ boxShadow: 12, borderRadius: '4px', my: 4 }}>
+                <CardHeader title="Search Portfolio" />
+
+                <Divider/>
+                <Box sx={{ m: 2 }}>
+                  {children}
+                </Box>
+              </Card>
+            }
+          >
+            <Typography variant='h4' component="h3" sx={{ my: 4, display: { sm: 'none'} }}>
+              Search Portfolio
+            </Typography>
+            
+            <FormControl fullWidth sx={{ mb: 2 }}>
+              <TextField
+                value={filters.text}
+                label="Search by Title"
+                variant="outlined"
+                onChange={(e) => handleFilterChange('text', e.target.value)}
+                InputProps={{
+                  endAdornment: <InputAdornment position="end">🔍</InputAdornment>,
+                }}
+              />
+            </FormControl>
+
+            <FormControl variant="outlined" fullWidth sx={{ mb: 2 }}>
+              <InputLabel id="category-label">Category</InputLabel>
               <Select
                 label="Category"
                 value={filters.category}
-                autoWidth
                 onChange={(e) => handleFilterChange('category', e.target.value)}
               >
                 {categories?.map((category) => (
@@ -97,16 +120,8 @@ const Search = () => {
                 ))}
               </Select>
             </FormControl>
-            <FormControlLabel
-              label="Only show products in stock"
-              control={
-                <Checkbox
-                  onChange={(e) => handleFilterChange('inStockOnly', e.target.checked)}
-                />
-              }
-              sx={{ my: 2 }}
-            />
-            <InputLabel sx={{ mt: 1 }}>Price Range</InputLabel>
+            
+            <InputLabel>Price Range</InputLabel>
             <Slider
               value={filters.priceRange}
               onChange={(e, newValue) => {
@@ -116,11 +131,20 @@ const Search = () => {
               min={0}
               max={500}
               step={10}
-              sx={{maxWidth: '90%', mx: 'auto', mb: 2}}
+              sx={{ width: '90%', mx: 'auto' }}
             />
-          </FormGroup>
+            <FormControlLabel
+              label="Only show products in stock"
+              control={
+                <Checkbox
+                  checked={filters.inStockOnly}
+                  onChange={(e) => handleFilterChange('inStockOnly', e.target.checked)}
+                />
+              }
+              sx={{ width: '90%', mx: 'auto' }}
+            />
+          </ConditionalWrapper>
         </Grid>
-        
         {isLoading && <CircularProgress />}
         {isError && <div>Error: {error?.message ?? 'Unknown error'}</div>}
         <Grid item xs={11} md={10}>

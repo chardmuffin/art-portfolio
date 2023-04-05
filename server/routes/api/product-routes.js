@@ -25,7 +25,7 @@ router.get('/', (req, res) => {
     ],
     attributes: {
       exclude: ['category_id'],
-      include: [[Sequelize.literal('(SELECT COUNT(*) FROM product_option WHERE product_option.product_id = Product.id)'), 'product_option_count']]
+      include: [[Sequelize.literal('(SELECT COUNT(*) FROM product_option WHERE product_option.product_id = product.id)'), 'product_option_count']]
     }
   })
     .then(dbPostData => res.json(dbPostData))
@@ -108,7 +108,7 @@ router.get('/:id', (req, res) => {
     ],
     attributes: {
       exclude: ['category_id'],
-      include: [[Sequelize.literal('(SELECT COUNT(*) FROM product_option WHERE product_option.product_id = Product.id)'), 'product_option_count']]
+      include: [[Sequelize.literal('(SELECT COUNT(*) FROM product_option WHERE product_option.product_id = product.id)'), 'product_option_count']]
     }
   })
     .then(dbProductData => {
@@ -280,7 +280,7 @@ router.post('/', withAuth, (req, res) => {
     image_id: 1                                                                               // optional
   }   
 */
-router.put('/:id', (req, res) => {
+router.put('/:id', withAuth, (req, res) => {
   // update product data
   Product.update(req.body, {
     where: {
