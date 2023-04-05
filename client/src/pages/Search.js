@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import ProductList from '../components/ProductList';
-import axios from 'axios';
+import axios from '../utils/axiosConfig';
 import { useQuery } from 'react-query';
 import {
   Container,
@@ -30,7 +30,7 @@ const Search = () => {
   //const mediumScreen = useMediaQuery('(max-width: 900px)');
 
   const { isLoading, isError, data, error } = useQuery('products', () =>
-    axios('http://localhost:3001/api/products', {
+    axios(`/api/products`, {
       responseType: 'json',
     }).then((response) => response.data)
   );

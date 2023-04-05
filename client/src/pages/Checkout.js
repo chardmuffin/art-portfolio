@@ -23,7 +23,7 @@ import { toMoneyFormat } from '../utils/helpers';
 import { Link } from 'react-router-dom';
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
-import axios from 'axios';
+import axios from '../utils/axiosConfig';
 import Sticky from 'react-stickynode';
 
 import StripeCheckoutForm from '../components/StripeCheckoutForm';

@@ -3,7 +3,7 @@ const routes = require('./routes');
 const sequelize = require('./config/connection');
 const cors = require('cors');
 const session = require('express-session');
-require('dotenv').config();
+require('dotenv').config({ path: '../.env' });
 
 const SequelizeStore = require('connect-session-sequelize')(session.Store);
 

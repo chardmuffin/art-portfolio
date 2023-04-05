@@ -3,6 +3,8 @@ An online gallery featuring original oil paintings and other work for sale. Buil
 
 ## Contributing
 
+Docker
+
 Material UI
 Jest
 Axios
@@ -13,6 +15,7 @@ formik
 yup
 react-stickynode
 emailjs
+serve
 
 nodeJS
 bcrypt

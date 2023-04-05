@@ -12,7 +12,7 @@ const Login = (props) => {
   });
 
   const { mutate, isLoading, isError, data, error } = useMutation(
-    (formData) => axios.post('http://localhost:3001/api/users/login', formData),
+    (formData) => axios.post(`${process.env.REACT_APP_API_URL}/api/users/login`, formData),
     {
       onSuccess: (data) => {
         console.log(data);

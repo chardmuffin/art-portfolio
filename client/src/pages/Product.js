@@ -3,7 +3,7 @@ import { Snackbar, Box, CircularProgress, Container, Typography, useMediaQuery, 
 import CloseIcon from '@mui/icons-material/Close';
 import DoneIcon from '@mui/icons-material/Done';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../utils/axiosConfig';
 import { useQuery } from 'react-query';
 import { toMoneyFormat } from '../utils/helpers';
 
@@ -15,7 +15,7 @@ const Product = ({ handleAddToCart }) => {
   // query get all possible product options by product id
   // const product = product and productOptions data
   const { isLoading, isError, data: product, error } = useQuery('productOptions', () =>
-    axios(`http://localhost:3001/api/products/${id}/options`, {
+    axios(`/api/products/${id}/options`, {
       responseType: 'json',
     }).then((response) => response.data)
   );
@@ -28,7 +28,7 @@ const Product = ({ handleAddToCart }) => {
   //   { "id": 3, "name": "Type", "options": [{ "id": 7, "name": "Original" }, { "id": 8, "name": "Print" }] }
   // ];
   const { isLoading: isLoadingOptionGroups, isError: isErrorOptionGroups, data: optionGroups, error: errorOptionGroups } = useQuery('optionGroups', () =>
-    axios(`http://localhost:3001/api/options/groups`, {
+    axios(`/api/options/groups`, {
       responseType: 'json',
     }).then((response) => response.data)
   );

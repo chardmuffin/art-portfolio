@@ -8,7 +8,7 @@ import {
 } from '@mui/material';
 import { Link } from 'react-router-dom';
 
-const ProductList = ({ products, title, titleVariant }) => {
+const ProductList = ({ products, title, titleVariant, titleAlign }) => {
 
   const smallScreen = useMediaQuery('(max-width: 600px)');
   const mediumScreen = useMediaQuery('(max-width: 900px)');
@@ -18,7 +18,7 @@ const ProductList = ({ products, title, titleVariant }) => {
 
   return (
     <Box sx={{ mx: 'auto', my: 2 }}>
-      <Typography variant={titleVariant ? titleVariant : 'h6'} sx={{ m: 2 }}>
+      <Typography variant={titleVariant ? titleVariant : 'h6'} textAlign={titleAlign && titleAlign} sx={{ m: 2 }}>
         {title}
       </Typography>
       {products.length >= 1

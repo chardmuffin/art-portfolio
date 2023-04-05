@@ -11,7 +11,7 @@ router.get('/', async (req, res) => {
   Category.findAll({
     attributes: [
       'name',
-      [Sequelize.literal('(SELECT COUNT(*) FROM product WHERE product.category_id = Category.id)'), 'product_count']
+      [Sequelize.literal('(SELECT COUNT(*) FROM product WHERE product.category_id = category.id)'), 'product_count']
     ]
   })
     .then(dbCategoryData => res.json(dbCategoryData))
@@ -28,7 +28,7 @@ router.get('/:id', (req, res) => {
     where: { id: req.params.id },
     attributes: [
       'name',
-      [Sequelize.literal('(SELECT COUNT(*) FROM product WHERE product.category_id = Category.id)'), 'product_count']
+      [Sequelize.literal('(SELECT COUNT(*) FROM product WHERE product.category_id = category.id)'), 'product_count']
     ]
   })
     .then(dbCategoryData => res.json(dbCategoryData))
