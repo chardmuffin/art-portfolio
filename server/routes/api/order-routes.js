@@ -51,7 +51,8 @@ router.get('/:id', withAuth, (req, res) => {
 // });
 
 // ================================ STRIPE =========================================
-const stripe = require("stripe")(process.env.STRIPE_SK_TEST)
+// const stripe = require("stripe")(process.env.STRIPE_SK_TEST);
+const stripe = require("stripe")(process.env.STRIPE_SK);
 
 // Calculate the order total on the server to prevent
 // people from directly manipulating the amount on the client

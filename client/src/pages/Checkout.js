@@ -30,10 +30,10 @@ import StripeCheckoutForm from '../components/StripeCheckoutForm';
 import ShippingAddressForm from '../components/ShippingAddressForm';
 import ConfirmRemoveItemDialog from '../components/ConfirmRemoveItemDialog';
 
-// Make sure to call loadStripe outside of a component’s render to avoid
-// recreating the Stripe object on every render.
-// This is your test publishable API key.
-const stripePromise = loadStripe("pk_test_51MlxOtIkA32m3k4INfMqyq2Nz6gVgheu3Y7gEqKQgPDnWWj9fRum27YKOnzXScpsrPIkzUD7Hxz7Dy2COGz4nK2Z009J1lob6N");
+// Make sure to call loadStripe outside of a component’s render to avoid recreating the Stripe object on every render.
+// This is publishable API key.
+// const stripePromise = loadStripe("pk_test_51MlxOtIkA32m3k4INfMqyq2Nz6gVgheu3Y7gEqKQgPDnWWj9fRum27YKOnzXScpsrPIkzUD7Hxz7Dy2COGz4nK2Z009J1lob6N");
+const stripePromise = loadStripe("pk_live_51MlxOtIkA32m3k4I6Clj3796ixTTqh0sv6xC7uvl4GrIAJRld7WLlNE7zEmoePEAomIQHXILZrHhcUsJKRHwbbVT00polWB07l");
 
 const Checkout = ({ cart, setCart, handleRemoveItem, mode, setOrder }) => {
 

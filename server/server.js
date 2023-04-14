@@ -19,6 +19,8 @@ const sess = {
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+// const bindingAddress = 'localhost';
+const bindingAddress = '0.0.0.0';
 
 app.use(session(sess)); // use express-session
 
@@ -32,5 +34,7 @@ app.use(routes); // turn on routes
 // turn on connection to db and server
 // edit to "force: true" if updating db models (will drop and recreate all tables)
 sequelize.sync({ force: false }).then(() => {
-  app.listen(PORT, () => console.log('Now listening'));
+  app.listen(PORT, bindingAddress, () => {
+    console.log(`Now listening on ${bindingAddress}:${PORT}`);
+  });
 });
