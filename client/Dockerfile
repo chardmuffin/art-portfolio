@@ -1,15 +1,9 @@
-FROM node:lts-alpine
-ARG NODE_ENV
-ENV NODE_ENV=${NODE_ENV}
-WORKDIR /usr/src/app/client
+# Serve React app using Nginx
+FROM nginx:stable-alpine
+COPY ./build /usr/share/nginx/html
 
-COPY ["package.json", "package-lock.json*", "npm-shrinkwrap.json*", "./"]
-RUN npm install --production --silent
+# Copy Nginx configuration
+COPY ./nginx.conf /etc/nginx/conf.d/default.conf
 
-COPY . .
-RUN chown -R node:node /usr/src/app/client
-
-USER node
-RUN npm run build
-      
-CMD ["npm", "run", "serve"]
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
