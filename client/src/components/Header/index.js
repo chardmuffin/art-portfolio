@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
@@ -18,13 +18,22 @@ import ShoppingCartTwoToneIcon from '@mui/icons-material/ShoppingCartTwoTone';
 
 import DarkModeSwitch from '../DarkModeSwitch';
 
+import { isLoggedIn } from '../../utils/helpers';
+
 const drawerWidth = 240;
 
 const Header = ({ window, cartCount, ColorModeContext, isCartAnimating }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const navigate = useNavigate();
 
   const handleDrawerToggle = () => {
     setMobileOpen((prevState) => !prevState);
+  };
+
+  const handleLogout = () => {
+    sessionStorage.removeItem('loggedIn');
+    sessionStorage.removeItem('user_id');
+    navigate('/login'); // Navigate to login page
   };
 
   const drawer = (
@@ -122,11 +131,11 @@ const Header = ({ window, cartCount, ColorModeContext, isCartAnimating }) => {
               component={Link}
               to={'/'}
               sx={{
-                  flexGrow: 1,
-                  display: { xs: 'none', sm: 'block' },
-                  color: 'inherit',
-                  textDecoration: 'none'
-                }}
+                flexGrow: 1,
+                display: { xs: 'none', sm: 'block' },
+                color: 'inherit',
+                textDecoration: 'none'
+              }}
             >
               <Typography variant="h5" component="h1" >
                 Richard Huffman
@@ -149,6 +158,17 @@ const Header = ({ window, cartCount, ColorModeContext, isCartAnimating }) => {
               <Button component={Link} to={'/contact'} color="inherit">
                 Contact
               </Button>
+              {isLoggedIn() &&
+              // admin-only buttons
+                <>
+                  <Button component={Link} to={'/admin-dashboard'} color="inherit">
+                    Dashboard
+                  </Button>
+                  <Button color="inherit" onClick={() => handleLogout()}>
+                    Logout
+                  </Button>
+                </>
+              }
               <IconButton
                 className={isCartAnimating ? 'wiggle' : ''}
                 component={Link}
@@ -157,7 +177,7 @@ const Header = ({ window, cartCount, ColorModeContext, isCartAnimating }) => {
               >
                 <Typography>({cartCount})</Typography>
                 {cartCount > 0 ? <ShoppingCartTwoToneIcon />: <ShoppingCartOutlined />}
-            </IconButton>
+              </IconButton>
             </Box>
           </Toolbar>
         </AppBar>

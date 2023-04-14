@@ -19,8 +19,10 @@ import Checkout from './pages/Checkout';
 import About from './pages/About';
 import Product from './pages/Product';
 import Contact from './pages/Contact';
+import AdminDashboard from './pages/AdminDashboard';
 
 import { usePersistentState } from './utils/hooks';
+import { isLoggedIn, withAuth } from './utils/helpers';
 import PaymentComplete from './pages/PaymentComplete';
 
 const ColorModeContext = createContext({ toggleColorMode: () => {} });
@@ -142,6 +144,8 @@ function App() {
                     order={order}
                   />}
                 />
+                {isLoggedIn && <Route path="/admin-dashboard" element={<AdminDashboard />} />}
+                
                 <Route path="*" element={<NoMatch />} />
               </Routes>
             </Box>

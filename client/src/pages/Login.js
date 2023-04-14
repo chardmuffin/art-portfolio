@@ -3,8 +3,9 @@ import axios from 'axios';
 import { useMutation } from 'react-query';
 import { Container, TextField, Button, Grid, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { isLoggedIn } from '../utils/helpers';
 
-const Login = (props) => {
+const Login = () => {
   const navigate = useNavigate();
   const [formState, setFormState] = useState({
     email: '',
@@ -12,12 +13,13 @@ const Login = (props) => {
   });
 
   const { mutate, isLoading, isError, data, error } = useMutation(
-    (formData) => axios.post(`${process.env.REACT_APP_API_URL}/api/users/login`, formData),
+    (formData) => axios.post(`/api/users/login`, formData),
     {
       onSuccess: (data) => {
-        console.log(data);
-        // Redirect to homepage
-        navigate('/');
+        console.log(data.data.user);
+        sessionStorage.setItem('loggedIn', true);
+        sessionStorage.setItem('user_id', data.data.user.id);
+        navigate('/admin-dashboard');
       },
     }
   );
@@ -49,6 +51,11 @@ const Login = (props) => {
 
   if (isError) {
     return <Container component={'main'}>Error: {error?.message ?? 'Unknown error'}</Container>;
+  }
+
+  // Redirect to admin dashboard if user is already logged in
+  if (isLoggedIn()) {
+    navigate('/admin-dashboard');
   }
 
   return (
