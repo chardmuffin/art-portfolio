@@ -3,7 +3,7 @@ An online gallery featuring original oil paintings and other work for sale. Buil
 
 Watch a brief video demo:
 
-[![Watch the video](./client/src/assets/images/thumbnail.png)](https://drive.google.com/file/d/1kYkIfwzzWknv6RLEsQKCg5BbcpUUrys7/view)
+[![Watch the video](./client/src/assets/thumbnail.png)](https://drive.google.com/file/d/1kYkIfwzzWknv6RLEsQKCg5BbcpUUrys7/view)
 
 ## License
 
