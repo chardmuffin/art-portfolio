@@ -29,6 +29,10 @@ router.get('/groups', async (req, res) => {
           model: Option,
           attributes: { exclude: ['option_group_id'] }
         }
+      ],
+      order: [
+        ['id', 'ASC'],
+        [{ model: Option }, 'id', 'ASC']
       ]
     });
     if (!optionGroups) {

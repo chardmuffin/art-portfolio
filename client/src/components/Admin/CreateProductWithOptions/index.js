@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
-const NewProductForm = () => {
+const CreateProductWithOptions = () => {
   const navigate = useNavigate();
   const [name, setName] = useState('');
   const [productOptions, setProductOptions] = useState([]);
@@ -49,7 +49,7 @@ const NewProductForm = () => {
     <Container component={'main'}>
       <Grid container justifyContent="center">
         <Grid item xs={12} sx={{ textAlign: 'center', my: 2 }}>
-          <Typography variant="h5">New Product</Typography>
+          <Typography variant="h5">New Product (With Options)</Typography>
         </Grid>
       </Grid>
 
@@ -101,4 +101,4 @@ const NewProductForm = () => {
   );
 };
 
-export default NewProductForm;
+export default CreateProductWithOptions;

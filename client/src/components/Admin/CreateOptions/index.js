@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, TextField } from '@mui/material';
 
-const NewOptionsForm = () => {
+const CreateOptions = () => {
   const [optionGroup, setOptionGroup] = useState('');
   const [options, setOptions] = useState(['']);
 
@@ -47,4 +47,4 @@ const NewOptionsForm = () => {
   );
 };
 
-export default NewOptionsForm;
+export default CreateOptions;

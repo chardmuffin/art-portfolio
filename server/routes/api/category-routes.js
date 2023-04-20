@@ -10,8 +10,12 @@ const withAuth = require('../../utils/auth');
 router.get('/', async (req, res) => {
   Category.findAll({
     attributes: [
+      'id',
       'name',
       [Sequelize.literal('(SELECT COUNT(*) FROM product WHERE product.category_id = category.id)'), 'product_count']
+    ],
+    order: [
+      ['id', 'ASC']
     ]
   })
     .then(dbCategoryData => res.json(dbCategoryData))

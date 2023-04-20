@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, TextField } from '@mui/material';
 
-const NewCategoryForm = () => {
+const CreateCategory = () => {
   const [category, setCategory] = useState('');
 
   const handleChange = (event) => {
@@ -27,4 +27,4 @@ const NewCategoryForm = () => {
   );
 };
 
-export default NewCategoryForm;
+export default CreateCategory;
