@@ -8,14 +8,10 @@ import { isLoggedIn } from '../utils/helpers';
 
 import CreateCategory from '../components/Admin/CreateCategory';
 import CreateOptionGroup from '../components/Admin/CreateOptionGroup';
-import CreateOptions from '../components/Admin/CreateOptions';
 import CreateProduct from '../components/Admin/CreateProduct';
-import CreateProductWithOptions from '../components/Admin/CreateProductWithOptions';
 import CategoriesTable from '../components/Admin/CategoriesTable';
-import ProductOptionsTable from '../components/Admin/ProductOptionsTable';
-import ProductsTable from '../components/Admin/ProductsTable';
-import OptionsTable from '../components/Admin/OptionsTable';
-import OptionGroupsTable from '../components/Admin/OptionGroupsTable';
+import ProductTable from '../components/Admin/ProductTable';
+import OptionsAndGroupsTable from '../components/Admin/OptionsAndGroupsTable';
 
 const AdminDashboard = () => {
   const [selectedNode, setSelectedNode] = useState({ nodeId: '' });
@@ -24,12 +20,8 @@ const AdminDashboard = () => {
 
   const nodeIdToLabel = {
     categories: 'Categories',
-    options: 'Options',
-    optionGroups: 'Option Groups',
-    products: 'Products',
-    productWithOptions: 'Products (Incl. Options)',
-    optionsAndOptionGroups: 'Options & Groups',
-    productsAndProductOptions: 'Product'
+    optionsAndGroups: 'Options & Groups',
+    product: 'Product'
   };
 
   const nodes = [
@@ -39,25 +31,15 @@ const AdminDashboard = () => {
       content: <CategoriesTable />,
     },
     {
-      nodeId: 'options',
-      newComponent: <CreateOptions />,
-      content: <OptionsTable />,
-    },
-    {
-      nodeId: 'optionGroups',
+      nodeId: 'optionsAndGroups',
       newComponent: <CreateOptionGroup />,
-      content: <OptionGroupsTable />,
+      content: <OptionsAndGroupsTable />,
     },
     {
-      nodeId: 'products',
+      nodeId: 'product',
       newComponent: <CreateProduct />,
-      content: <ProductsTable />,
-    },
-    {
-      nodeId: 'productWithOptions',
-      newComponent: <CreateProductWithOptions />,
-      content: <ProductOptionsTable />,
-    },
+      content: <ProductTable />,
+    }
   ];
 
   useEffect(() => {
@@ -69,29 +51,11 @@ const AdminDashboard = () => {
   };
 
   const generateBreadcrumbs = () => {
-    const parentNodes = {
-      options: 'optionsAndOptionGroups',
-      optionGroups: 'optionsAndOptionGroups',
-      products: 'productsAndProductOptions',
-      productWithOptions: 'productsAndProductOptions',
-    };
-  
-    const parentNodeId = parentNodes[selectedNode.nodeId];
-    const parentNodeLabel = nodeIdToLabel[parentNodeId];
-
     const breadcrumbs = [
       <Link key="dashboard" underline="hover" color="inherit" onClick={() => setSelectedNode({ nodeId: '' })}>
         Dashboard
       </Link>,
     ];
-
-    if (parentNodeLabel) {
-      breadcrumbs.push(
-        <Link key={parentNodeId} underline="hover" color="inherit" onClick={(e) => handleNodeSelect(e, parentNodeId)}>
-          {parentNodeLabel}
-        </Link>,
-      );
-    }
   
     if (selectedNode.nodeId) {
       breadcrumbs.push(
@@ -132,14 +96,8 @@ const AdminDashboard = () => {
             onNodeSelect={(e, nodeId) => handleNodeSelect(e, nodeId)}
           >
             <TreeItem nodeId="categories" label="Categories" />
-            <TreeItem nodeId="optionsAndOptionGroups" label="Options & Groups">
-              <TreeItem nodeId="optionGroups" label="Option Groups" />
-              <TreeItem nodeId="options" label="Options"/>  
-            </TreeItem>
-            <TreeItem nodeId="productsAndProductOptions" label="Product">
-              <TreeItem nodeId="products" label="Products" />
-              <TreeItem nodeId="productWithOptions" label="Products (Incl. Options)" />
-            </TreeItem>
+            <TreeItem nodeId="optionsAndGroups" label="Options & Groups" />
+            <TreeItem nodeId="product" label="Product" />
           </TreeView>
         </Grid>
         <Grid item xs={12} md={10}>
@@ -169,12 +127,7 @@ const AdminDashboard = () => {
       </Grid>
 
       <Drawer anchor="right" open={drawerOpen} onClose={toggleDrawer}>
-        <Box
-          sx={{ width: '100%', maxWidth: 400, p: 3 }}
-          role="presentation"
-          onClick={toggleDrawer}
-          onKeyDown={toggleDrawer}
-        >
+        <Box role="presentation" sx={{ width: '100%', maxWidth: 400, p: 3 }} >
           {selectedNode.newComponent}
         </Box>
       </Drawer>

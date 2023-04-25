@@ -9,12 +9,12 @@ const SequelizeStore = require('connect-session-sequelize')(session.Store);
 
 const sess = {
   secret: process.env.SECRET,
-  cookie: {},
+  cookie: { maxAge: 3600000 },
   resave: false,
-  saveUninitialized: true,
   store: new SequelizeStore({
-    db: sequelize
-  })
+    db: sequelize,
+  }),
+  proxy: true
 };
 
 const app = express();
@@ -27,7 +27,14 @@ app.use(session(sess)); // use express-session
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(cors()); // enable CORS for all routes
+// enable CORS for all routes
+const corsOptions = {
+  origin: process.env.ORIGIN,
+  credentials: true,
+  methods: ['GET', 'PUT', 'POST', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
+};
+app.use(cors(corsOptions));
 
 app.use(routes); // turn on routes
 

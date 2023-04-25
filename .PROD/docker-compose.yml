@@ -24,6 +24,7 @@ services:
       - RDS_HOSTNAME=${RDS_HOSTNAME}
       - RDS_PORT=${RDS_PORT}
       - DATABASE_URL=mysql://${RDS_USERNAME}:${RDS_PASSWORD}@${RDS_HOSTNAME}:${RDS_PORT}/${RDS_DB_NAME}
+      - ORIGIN=${ORIGIN}
     networks:
       - app_network
 

@@ -20,7 +20,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
-const ProductsTable = () => {
+const ProductTable = () => {
   const { isLoading, isError, data, error } = useQuery('products', () =>
     axios('/api/products', {
       responseType: 'json',
@@ -32,7 +32,7 @@ const ProductsTable = () => {
 
   return (
     <TableContainer component={Paper}>
-      <Table size="small" padding="dense">
+      <Table size="small">
         <TableHead>
           <TableRow>
             <TableCell />
@@ -136,10 +136,7 @@ const ProductRow = ({ product }) => {
                     </TableHead>
                     <TableBody>
                       {productOptionsQuery.data.map((option) => (
-                        <TableRow
-                          key={option.id}
-                          sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                        >
+                        <TableRow key={option.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }} >
                           <TableCell>{option.id}</TableCell>
                           <TableCell>
                             {parseFloat(option.price_difference) + parseFloat(product.price)}
@@ -186,4 +183,4 @@ const ProductRow = ({ product }) => {
   );
 };
 
-export default ProductsTable;
+export default ProductTable;

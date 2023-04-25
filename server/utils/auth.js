@@ -1,6 +1,9 @@
 const withAuth = (req, res, next) => {
-  if (!req.session.user_id) {
-    res.redirect('/login');
+  console.log("Session ID:", req.sessionID);
+  console.log("Session data:", req.session);
+
+  if (!req.session.loggedIn) {
+    res.status(401).json({ message: 'Unauthorized access' });
   } else {
     next();
   }

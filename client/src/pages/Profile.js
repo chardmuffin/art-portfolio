@@ -1,5 +1,5 @@
 import React from 'react';
-import axios from 'axios';
+import axios from '../utils/axiosConfig';
 import { useQuery } from 'react-query';
 import { Container } from '@mui/material';
 

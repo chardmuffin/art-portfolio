@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import axios from '../utils/axiosConfig';
 import { useMutation } from 'react-query';
 import { Container, TextField, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
@@ -12,7 +12,7 @@ const Signup = () => {
   });
 
   const { mutate, isLoading, isError, data, error } = useMutation(
-    (formData) => axios.post('http://localhost:3001/api/users/', formData),
+    (formData) => axios.post('/api/users/', formData),
     {
       onSuccess: (data) => {
         console.log(data);
