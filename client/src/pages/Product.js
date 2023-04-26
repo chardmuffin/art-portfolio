@@ -154,7 +154,7 @@ const Product = ({ handleAddToCart }) => {
           <Grid container spacing={4}>
             <Grid item xs={12} md={8}>
               <Box component={'img'}
-                src={`http://localhost:3001/api/products/images/${product.image.id}?width=${width}&height=${height}`}
+                src={`${process.env.REACT_APP_API_BASE_URL}/api/products/images/${product.image.id}?width=${width}&height=${height}`}
                 alt={product.name}
                 loading="lazy"
                 sx={{

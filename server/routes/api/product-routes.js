@@ -319,14 +319,15 @@ router.delete('/:id', withAuth, (req, res) => {
 
 // create a single product option
 // POST /api/products/options
-// expects {
-//   "option_price": 10.99,
-//   "stock": 20,
-//   "product_id": 1,
-//   "option_id_1": 1,
-//   "option_id_2": 4,        //optional
-//   "option_id_3": 7         //optional
-// }
+// expects
+//   {
+//     "price_difference": 20,
+//     "stock": 3,
+//     "product_id": 2,
+//     "option_id_1": 2,      optional
+//     "option_id_2": 4,      optional
+//     "option_id_3": 7
+//  }
 router.post('/options', withAuth, (req, res) => {
   ProductOption.create(req.body)
     .then(dbProductOptionData => res.json(dbProductOptionData))

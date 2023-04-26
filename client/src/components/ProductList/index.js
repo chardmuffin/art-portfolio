@@ -27,7 +27,7 @@ const ProductList = ({ products, title, titleVariant, titleAlign }) => {
             <ImageListItem key={product.id} sx={{ textAlign: 'center', p: 2 }}>
               <Link to={`/products/${product.id}`}>
                 <Box component={'img'}
-                  src={`http://localhost:3001/api/products/images/${product.image.id}?width=${width}&height=${height}`}
+                  src={`${process.env.REACT_APP_API_BASE_URL}/api/products/images/${product.image.id}?width=${width}&height=${height}`}
                   alt={product.name}
                   loading="lazy"
                   sx={{ maxWidth: '100%', maxHeight: '100%', borderRadius: '2px', boxShadow: 8 }}

@@ -145,6 +145,21 @@ const Header = ({ window, cartCount, ColorModeContext, isCartAnimating }) => {
               </Typography>
             </Box>
 
+            {isLoggedIn() &&
+              // admin-only buttons
+              <>
+                <Button component={Link} to={'/admin-dashboard'} color="inherit">
+                  Dashboard
+                </Button>
+                <Button color="inherit" onClick={() => handleLogout()}>
+                  Logout
+                </Button>
+                <Box sx={{flexGrow: 10}}>
+                  <Divider />
+                </Box>
+              </>
+            }
+
             <Box sx={{ display: { xs: 'none', sm: 'block' }, textAlign: 'right' }}>
               <Button component={Link} to={'/'} color="inherit">
                 Browse
@@ -158,17 +173,6 @@ const Header = ({ window, cartCount, ColorModeContext, isCartAnimating }) => {
               <Button component={Link} to={'/contact'} color="inherit">
                 Contact
               </Button>
-              {isLoggedIn() &&
-              // admin-only buttons
-                <>
-                  <Button component={Link} to={'/admin-dashboard'} color="inherit">
-                    Dashboard
-                  </Button>
-                  <Button color="inherit" onClick={() => handleLogout()}>
-                    Logout
-                  </Button>
-                </>
-              }
               <IconButton
                 className={isCartAnimating ? 'wiggle' : ''}
                 component={Link}

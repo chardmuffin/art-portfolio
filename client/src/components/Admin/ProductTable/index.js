@@ -14,11 +14,15 @@ import {
   CircularProgress,
   Collapse,
   Paper,
+  Button,
+  Drawer
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+
+import CreateProductOption from '../CreateProductOption';
 
 const ProductTable = () => {
   const { isLoading, isError, data, error } = useQuery('products', () =>
@@ -35,7 +39,6 @@ const ProductTable = () => {
       <Table size="small">
         <TableHead>
           <TableRow>
-            <TableCell />
             <TableCell>ID</TableCell>
             <TableCell>Name</TableCell>
             <TableCell>Description</TableCell>
@@ -62,6 +65,10 @@ const ProductTable = () => {
 
 const ProductRow = ({ product }) => {
   const [open, setOpen] = useState(false);
+  const [drawer, setDrawer] = useState({
+    isOpen: false,
+    product: {}
+  });
 
   const productOptionsQuery = useQuery(['productOptions', product.id], () =>
     axios(`/api/products/${product.id}/options`, {
@@ -73,26 +80,28 @@ const ProductRow = ({ product }) => {
     setOpen(!open);
   };
 
+  const toggleDrawer = (product) => {
+    setDrawer({ product: product, isOpen: !drawer.isOpen });
+  };
+
   return (
     <>
       <TableRow>
-        <TableCell>
-          {product.product_option_count > 0 && (
-            <IconButton size="small" onClick={handleToggle}>
-              {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-            </IconButton>
-          )}
-        </TableCell>
         <TableCell>{product.id}</TableCell>
         <TableCell>{product.name}</TableCell>
         <TableCell>{product.description}</TableCell>
         <TableCell>{product.price}</TableCell>
         <TableCell>{product.stock}</TableCell>
-        <TableCell>{product.product_option_count}</TableCell>
+        <TableCell>
+          {product.product_option_count}
+          <IconButton size="small" onClick={handleToggle}>
+            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+          </IconButton>
+        </TableCell>
         <TableCell>{product.category.name}</TableCell>
         <TableCell>
           <Box component={'img'}
-            src={`http://localhost:3001/api/products/images/${product.image.id}?width=50`}
+            src={`${process.env.REACT_APP_API_BASE_URL}/api/products/images/${product.image.id}?width=50`}
             alt={product.name}
             loading="lazy"
             sx={{ maxWidth: '100%', maxHeight: '100%', boxShadow: 4 }}
@@ -117,12 +126,12 @@ const ProductRow = ({ product }) => {
                 <Typography variant="h6" gutterBottom>
                   {product.name} - Product Options
                 </Typography>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                  }}
-                >
+                <Box ml="auto">
+                  <Button variant="outlined" onClick={() => toggleDrawer(product)}>
+                    <Typography variant='button'>New</Typography>
+                  </Button>
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                   <Table size="small">
                     <TableHead>
                       <TableRow>
@@ -179,6 +188,13 @@ const ProductRow = ({ product }) => {
           </TableCell>
         </TableRow>
       )}
+
+      <Drawer anchor="right" open={drawer.isOpen} onClose={() => toggleDrawer({})}>
+        <Box role="presentation" sx={{ width: '100%', maxWidth: 400, p: 3 }} >
+          <CreateProductOption product={drawer.product} />
+        </Box>
+      </Drawer>
+
     </>
   );
 };
