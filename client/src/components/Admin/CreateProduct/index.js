@@ -1,104 +1,135 @@
 import React, { useState } from 'react';
-import {
-  Box,
-  Button,
-  Checkbox,
-  Container,
-  FormControl,
-  FormControlLabel,
-  FormGroup,
-  FormLabel,
-  Grid,
-  TextField,
-  Typography
-} from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { Card, CardContent, CardHeader, TextField, Button, InputLabel, Input, FormControl, Select, MenuItem } from '@mui/material';
+import axios from '../../../utils/axiosConfig';
+import { useMutation, useQuery } from 'react-query';
 
 const CreateProduct = () => {
-  const navigate = useNavigate();
-  const [name, setName] = useState('');
-  const [productOptions, setProductOptions] = useState([]);
-  const [image, setImage] = useState('');
+  const [product, setProduct] = useState({
+    name: '',
+    description: '',
+    price: '',
+    stock: '',
+    category_id: ''
+  });
+  const [image, setImage] = useState(null);
 
-  const handleNameChange = (event) => {
-    setName(event.target.value);
-  };
+  const { data: categories, isLoading: categoriesLoading } = useQuery('categories', () =>
+    axios.get('/api/categories').then((res) => res.data)
+  );
 
-  const handleOptionGroupChange = (event) => {
-    const optionGroup = event.target.name;
-    const isChecked = event.target.checked;
+  const createProductMutation = useMutation(
+    async () => {
+      const { data: newProduct } = await axios.post('/api/products', product, { withCredentials: true });
 
-    if (isChecked) {
-      setProductOptions([...productOptions, optionGroup]);
-    } else {
-      setProductOptions(productOptions.filter((option) => option !== optionGroup));
+      const data = new FormData();
+      data.append('image', image)
+      data.append('product_id', newProduct.id)
+      await axios.post('/api/products/images', data, { withCredentials: true, headers: {
+        'Content-Type': `multipart/form-data; boundary=${data._boundary}`,
+      } });
+    },
+    {
+      onSuccess: () => {
+        setProduct({ name: '', description: '', price: '', stock: '', category_id: '' });
+        setImage(null);
+        alert('Product created successfully!');
+      },
+      onError: (error) => {
+        alert('There was an error creating the product:\n\n' + error.message);
+      },
     }
+  );
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    const formData = new FormData();
+    formData.append('image', image);
+    formData.append('product_id', product.id);
+    createProductMutation.mutate(formData);
   };
 
-  const handleImageChange = (e) => {
-    setImage(e.target.files[0]);
+  const handleInputChange = async (event) => {
+    const { name, value } = event.target;
+    setProduct({ ...product, [name]: value });
   };
 
-  const optionGroups = [
-    { id: 1, name: 'Option Group 1' },
-    { id: 2, name: 'Option Group 2' },
-    { id: 3, name: 'Option Group 3' }
-  ];
+  const handleFileChange = (event) => {
+    setImage(event.target.files[0]);
+  };
 
   return (
-    <Container component={'main'}>
-      <Grid container justifyContent="center">
-        <Grid item xs={12} sx={{ textAlign: 'center', my: 2 }}>
-          <Typography variant="h5">New Product</Typography>
-        </Grid>
-      </Grid>
-
-      <form>
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <TextField
-              required
-              fullWidth
-              id="product-name"
-              label="Product Name"
-              variant="outlined"
-              value={name}
-              onChange={handleNameChange}
-            />
-          </Grid>
-
-          <Grid item xs={12}>
-            <FormControl component="fieldset">
-              <FormLabel component="legend">Product Options</FormLabel>
-              <FormGroup>
-                {optionGroups.map((optionGroup) => (
-                  <FormControlLabel
-                    key={optionGroup.id}
-                    control={
-                      <Checkbox
-                        name={optionGroup.name}
-                        checked={productOptions.includes(optionGroup.name)}
-                        onChange={handleOptionGroupChange}
-                      />
-                    }
-                    label={optionGroup.name}
-                  />
-                ))}
-              </FormGroup>
-            </FormControl>
-          </Grid>
-
-          <Grid item xs={12} sx={{ textAlign: 'center' }}>
-            <Button variant="contained" component="label">
-              Upload Image
-              <input type="file" hidden onChange={handleImageChange} />
-            </Button>
-            {image && <Typography>{image.name}</Typography>}
-          </Grid>
-        </Grid>
-      </form>
-    </Container>
-  );
+    <Card sx={{ boxShadow: 8, borderRadius: '4px', mt: 2 }}>
+      <CardHeader title="Create Product" sx={{ pb: 0 }} />
+      <CardContent>
+        <form noValidate autoComplete="off" onSubmit={handleSubmit}>
+          <TextField
+            fullWidth
+            name="name"
+            label="Product Name"
+            value={product.name}
+            onChange={handleInputChange}
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            fullWidth
+            name="description"
+            label="Description"
+            value={product.description}
+            onChange={handleInputChange}
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            fullWidth
+            name="price"
+            label="Price"
+            value={product.price}
+            onChange={handleInputChange}
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            fullWidth
+            name="stock"
+            label="Stock"
+            value={product.stock}
+            onChange={handleInputChange}
+            sx={{ mb: 2 }}
+          />
+          <FormControl fullWidth sx={{ mb: 2 }}>
+            <InputLabel htmlFor="category_id">Category</InputLabel>
+            <Select
+              label="Category"
+              name="category_id"
+              id="category_id"
+              value={product.category_id}
+              onChange={handleInputChange}
+            >
+              {categoriesLoading ? (
+                <MenuItem value="">
+                  <em>Loading...</em>
+                </MenuItem>
+              ) : (
+                categories.map((category) => (
+                  <MenuItem key={category.id} value={category.id}>
+                    {category.name}
+                  </MenuItem>
+                ))
+              )}
+            </Select>
+          </FormControl>
+          <InputLabel htmlFor="image">Product Image</InputLabel>
+          <Input
+            id="image"
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+          />
+          <Button type="submit" variant="contained" sx={{ mt: 2 }} disabled={createProductMutation.isLoading}>
+            Save
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
+  );  
 };
 
 export default CreateProduct;

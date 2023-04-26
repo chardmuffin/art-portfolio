@@ -5,6 +5,8 @@ const sharp = require('sharp');
 const fs = require('fs');
 const path = require('path');
 const withAuth = require('../../utils/auth');
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' });
 
 // the `/api/products` endpoint
 
@@ -388,21 +390,16 @@ router.delete('/options/:id', withAuth, (req, res) => {
 
 // create a single product image
 // POST /api/products/images
-// expects {
-//   "filename": 'artie.jpg',   // required:
-//                              // a large, compressed image in jpg format. e.g dimensions 3000w x 4000h and 500KB.
-//   "product_id": 1
-// }
-router.post('/images', withAuth, (req, res) => {
-  const { filename, product_id } = req.body;
+router.post('/images', withAuth, upload.single('image'), (req, res) => {
+  const { product_id } = req.body;
 
-  if (!filename) {
-    res.status(400).json({ message: 'Filename is required' });
+  if (!req.file) {
+    res.status(400).json({ message: 'Image file is required' });
     return;
   }
 
-  // Read the image file from local folder
-  const imagePath = path.join(__dirname, '../../../client/src/assets/images/products', filename);
+  // Read the image file from the uploaded file
+  const imagePath = req.file.path;
 
   sharp(imagePath)
     .toBuffer((err, data) => {
@@ -412,10 +409,8 @@ router.post('/images', withAuth, (req, res) => {
         return;
       }
 
-      //console.log(data.byteLength)
-
       // Create the Image object with the buffer data
-      Image.create({ filename, data, product_id })
+      Image.create({ filename: req.file.originalname, data, product_id })
         .then(dbImageData => res.json(dbImageData))
         .catch(err => {
           console.log(err);
