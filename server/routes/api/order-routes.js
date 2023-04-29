@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const { Order, OrderDetail } = require('../../models');
-const withAuth = require('../../utils/auth');
+const { withAuth } = require('../../utils/helpers');
 
 // the `/api/orders` endpoint
 
@@ -51,8 +51,11 @@ router.get('/:id', withAuth, (req, res) => {
 // });
 
 // ================================ STRIPE =========================================
-// const stripe = require("stripe")(process.env.STRIPE_SK_TEST);
-const stripe = require("stripe")(process.env.STRIPE_SK);
+const stripeApiKey = process.env.NODE_ENV === 'production'
+  ? process.env.STRIPE_SK
+  : process.env.STRIPE_SK_TEST;
+
+const stripe = require("stripe")(stripeApiKey);
 
 // Calculate the order total on the server to prevent
 // people from directly manipulating the amount on the client
@@ -82,9 +85,9 @@ const calculateOrderAmount = (cart) => {
   // https://www.ups.com/upsdeveloperkit/downloadresource?loc=en_US
   const calculatedShipping = 10; // $10 fixed shipping cost
 
-  const total = subtotal + calculatedTax + calculatedShipping
+  const totalInCents = subtotal + calculatedTax + calculatedShipping * 100;
 
-  return parseFloat(total);
+  return parseInt(totalInCents);
 };
 
 router.post("/create-payment-intent", async (req, res) => {

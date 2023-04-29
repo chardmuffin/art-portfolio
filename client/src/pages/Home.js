@@ -24,7 +24,7 @@ const Home = () => {
     <Container component={'main'}>
       <Grid container spacing={2} justifyContent="center" sx={{ my: 4 }}>
         <Grid item xs={11} md={10}>
-          {data && <ProductList products={data} title="Artwork for purchase" titleAlign="center" titleVariant='h5' />}
+          {data && <ProductList products={data} title="Gallery" titleAlign="center" titleVariant='h5' />}
         </Grid>
       </Grid>
       

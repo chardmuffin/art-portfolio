@@ -5,6 +5,10 @@ import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import emailjs from 'emailjs-com';
 
+const serviceID = process.env.REACT_APP_EMAILJS_SERVICE_ID;
+const templateID = process.env.REACT_APP_EMAILJS_TEMPLATE_ID;
+const userID = process.env.REACT_APP_EMAILJS_USER_ID;
+
 const Contact = () => {
   const initialValues = {
     name: '',
@@ -21,10 +25,6 @@ const Contact = () => {
     email: Yup.string().email('Invalid email format').notRequired(),
     phone: Yup.string().notRequired(),
   });
-
-  const serviceID = process.env.REACT_APP_EMAILJS_SERVICE_ID;
-  const templateID = process.env.REACT_APP_EMAILJS_TEMPLATE_ID;
-  const userID = process.env.REACT_APP_EMAILJS_USER_ID;
 
   const handleSubmit = (values, actions) => {
     emailjs
@@ -64,7 +64,7 @@ const Contact = () => {
     <Container component={'main'}>
       <Grid container justifyContent="center">
         <Grid item xs={12} md={8}>
-          <Card sx={{ my: 2, boxShadow: 8, borderRadius: '2px' }}>
+          <Card sx={{ my: 4, boxShadow: 8, borderRadius: '4px' }}>
             <CardHeader title="Get in Touch" sx={{ textAlign: 'center' }} />
             <Divider />
             <CardContent>

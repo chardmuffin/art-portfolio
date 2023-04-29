@@ -4,9 +4,14 @@ const { Sequelize } = require('sequelize');
 const sharp = require('sharp');
 const fs = require('fs');
 const path = require('path');
-const withAuth = require('../../utils/auth');
+const { withAuth } = require('../../utils/helpers');
 const multer = require('multer');
-const upload = multer({ dest: 'uploads/' });
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5 MB
+  },
+});
 
 // the `/api/products` endpoint
 
@@ -400,9 +405,9 @@ router.post('/images', withAuth, upload.single('image'), (req, res) => {
   }
 
   // Read the image file from the uploaded file
-  const imagePath = req.file.path;
+  const imageBuffer = req.file.buffer;
 
-  sharp(imagePath)
+  sharp(imageBuffer)
     .toBuffer((err, data) => {
       if (err) {
         console.log(err);

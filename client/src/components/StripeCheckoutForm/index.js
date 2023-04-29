@@ -7,7 +7,7 @@ import {
 import { Button } from "@mui/material";
 import { Box, Typography, CircularProgress } from "@mui/material";
 
-const StripeCheckoutForm = ({ handleBack, shippingInfo, setOrder, cart }) => {
+const StripeCheckoutForm = ({ handleBack, shippingInfo, setOrder, total, cart }) => {
   const stripe = useStripe();
   const elements = useElements();
 
@@ -60,14 +60,16 @@ const StripeCheckoutForm = ({ handleBack, shippingInfo, setOrder, cart }) => {
     setOrder({
       purchasedItems: cart,
       shippingInfo: shippingInfo,
+      total: total,
       orderDate: new Date().toISOString(),
     });
 
+    const urlRoot = process.env.NODE_ENV === 'production' ? process.env.REACT_APP_API_BASE_URL : 'http://localhost:3000';
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
         // Make sure to change this to your payment completion page
-        return_url: "http://localhost:3000/payment-complete"
+        return_url: `${urlRoot}/payment-complete`
       },
     });
 

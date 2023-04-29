@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const { Option, Product, ProductOption, OptionGroup, Category } = require('../../models');
 const { Sequelize } = require('sequelize');
-const withAuth = require('../../utils/auth');
+const { withAuth } = require('../../utils/helpers');
 
 // the `/api/options` and `/api/options/groups` endpoints
 

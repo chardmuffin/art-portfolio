@@ -32,8 +32,8 @@ import ConfirmRemoveItemDialog from '../components/ConfirmRemoveItemDialog';
 
 // Make sure to call loadStripe outside of a component’s render to avoid recreating the Stripe object on every render.
 // This is publishable API key.
-// const stripePromise = loadStripe("pk_test_51MlxOtIkA32m3k4INfMqyq2Nz6gVgheu3Y7gEqKQgPDnWWj9fRum27YKOnzXScpsrPIkzUD7Hxz7Dy2COGz4nK2Z009J1lob6N");
-const stripePromise = loadStripe("pk_live_51MlxOtIkA32m3k4I6Clj3796ixTTqh0sv6xC7uvl4GrIAJRld7WLlNE7zEmoePEAomIQHXILZrHhcUsJKRHwbbVT00polWB07l");
+const stripeKey = process.env.NODE_ENV === 'production' ? 'pk_live_51MlxOtIkA32m3k4I6Clj3796ixTTqh0sv6xC7uvl4GrIAJRld7WLlNE7zEmoePEAomIQHXILZrHhcUsJKRHwbbVT00polWB07l' : 'pk_test_51MlxOtIkA32m3k4INfMqyq2Nz6gVgheu3Y7gEqKQgPDnWWj9fRum27YKOnzXScpsrPIkzUD7Hxz7Dy2COGz4nK2Z009J1lob6N';
+const stripePromise = loadStripe(stripeKey);
 
 const Checkout = ({ cart, setCart, handleRemoveItem, mode, setOrder }) => {
 
@@ -104,8 +104,7 @@ const Checkout = ({ cart, setCart, handleRemoveItem, mode, setOrder }) => {
     // sign up for UPS API - calculate shipping, validate address
     // https://www.ups.com/upsdeveloperkit/downloadresource?loc=en_US
     //const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
-    const cartCount = 2;
-    const calculatedShipping = 10 + 10 * (cartCount / 2);
+    const calculatedShipping = 10;
 
     setTax(toMoneyFormat(calculatedTax));
     setShipping(toMoneyFormat(calculatedShipping));
@@ -195,6 +194,7 @@ const Checkout = ({ cart, setCart, handleRemoveItem, mode, setOrder }) => {
           handleBack={showStep1}
           shippingInfo={shippingInfo}
           setOrder={setOrder}
+          total={total}
           cart={cart}
         />
       </Elements>
@@ -297,7 +297,7 @@ const Checkout = ({ cart, setCart, handleRemoveItem, mode, setOrder }) => {
                       <CardMedia
                         sx={{ width: 120, boxShadow: 16, borderRadius: "2px", m: 2}}
                         component="img"
-                        image={`http://localhost:3001/api/products/images/${item.image.id}?width=120`}
+                        image={`${process.env.REACT_APP_API_BASE_URL}/api/products/images/${item.image.id}?width=120`}
                         title={item.name}
                       />
                     </Box>

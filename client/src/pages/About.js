@@ -6,7 +6,7 @@ const About = () => {
     <Container component={'main'}>
       <Grid container justifyContent="center">
         <Grid item xs={12} md={8}>
-          <Card sx={{ my: 2, boxShadow: 8, borderRadius: '2px' }}>
+          <Card sx={{ my: 4, boxShadow: 8, borderRadius: '4px' }}>
             <CardHeader title="About" sx={{ textAlign: 'center' }} />
             <Divider />
             <CardContent>

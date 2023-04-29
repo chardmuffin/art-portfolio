@@ -22,7 +22,7 @@ import Contact from './pages/Contact';
 import AdminDashboard from './pages/AdminDashboard';
 
 import { usePersistentState } from './utils/hooks';
-import { isLoggedIn, withAuth } from './utils/helpers';
+import { isLoggedIn } from './utils/helpers';
 import PaymentComplete from './pages/PaymentComplete';
 
 const ColorModeContext = createContext({ toggleColorMode: () => {} });
@@ -97,6 +97,7 @@ function App() {
   // Order processing
   const [order, setOrder] = usePersistentState("RHArt-order", {
     purchasedItems: [],
+    total: "",
     shippingInfo: {},
     orderDate: null,
   });

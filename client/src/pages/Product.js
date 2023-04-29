@@ -213,11 +213,15 @@ const Product = ({ handleAddToCart }) => {
                 </Box>
               )}
               {stock <= 3 && (
-                <Typography sx={{ fontStyle: 'italic', textAlign: 'center', mb: 2, mt: -1 }}>
-                  {stock} left in stock!
-                </Typography>
+                stock > 0
+                ? <Typography sx={{ fontStyle: 'italic', textAlign: 'center', mb: 2, mt: -1 }}>
+                    {stock} left in stock!
+                  </Typography>
+                : <Typography>
+                    SOLD
+                  </Typography>
               )}
-              {(form.selectedItem?.product_option || availableGroups.length <= 0) &&
+              {((form.selectedItem?.product_option || availableGroups.length <= 0) && stock >= 1) &&
                 <Box sx={{ mx: 'auto', my: 2, textAlign: 'center', display: 'flex', flexWrap: 'nowrap', justifyContent: 'space-between', alignItems: 'center' }}>
                   <Typography variant='h5' component='h3' sx={{ textAlign: 'left' }}>
                     Total: {toMoneyFormat(price)}
