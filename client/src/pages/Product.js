@@ -54,6 +54,7 @@ const Product = ({ handleAddToCart }) => {
   const mediumScreen = useMediaQuery('(max-width: 960px)');
   const width = smallScreen ? 300 : mediumScreen ? 550 : 800;
   const height = smallScreen ? 400 : 700;
+  const urlRoot = process.env.NODE_ENV === 'production' ? process.env.REACT_APP_API_BASE_URL : 'http://localhost:3001'
   
   // what are the available options for this product?
   // compare optionGroups to productOptions
@@ -144,8 +145,6 @@ const Product = ({ handleAddToCart }) => {
   if (isError || isErrorOptionGroups) {
     return <Container component={'main'}>Error: {(error?.message || errorOptionGroups?.message) ?? 'Unknown error'}</Container>;
   }
-
-  // animate the add to cart button
   
   return (
     <Container component={'main'}>
@@ -154,7 +153,7 @@ const Product = ({ handleAddToCart }) => {
           <Grid container spacing={4}>
             <Grid item xs={12} md={8}>
               <Box component={'img'}
-                src={`${process.env.REACT_APP_API_BASE_URL}/api/products/images/${product.image.id}?width=${width}&height=${height}`}
+                src={`${urlRoot}/api/products/images/${product.image.id}?width=${width}&height=${height}`}
                 alt={product.name}
                 loading="lazy"
                 sx={{

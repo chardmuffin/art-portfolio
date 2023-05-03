@@ -37,6 +37,8 @@ const stripePromise = loadStripe(stripeKey);
 
 const Checkout = ({ cart, setCart, handleRemoveItem, mode, setOrder }) => {
 
+  const urlRoot = process.env.NODE_ENV === 'production' ? process.env.REACT_APP_API_BASE_URL : 'http://localhost:3001'
+
   // const smallScreen = useMediaQuery('(max-width: 600px)');
   const mediumScreen = useMediaQuery('(max-width: 900px)');
 
@@ -297,7 +299,7 @@ const Checkout = ({ cart, setCart, handleRemoveItem, mode, setOrder }) => {
                       <CardMedia
                         sx={{ width: 120, boxShadow: 16, borderRadius: "2px", m: 2}}
                         component="img"
-                        image={`${process.env.REACT_APP_API_BASE_URL}/api/products/images/${item.image.id}?width=120`}
+                        image={`${urlRoot}/api/products/images/${item.image.id}?width=120`}
                         title={item.name}
                       />
                     </Box>

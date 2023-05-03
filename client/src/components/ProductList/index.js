@@ -15,6 +15,7 @@ const ProductList = ({ products, title, titleVariant, titleAlign }) => {
   const cols = smallScreen ? 1 : (mediumScreen ? 2 : 3);
   const width = 300;
   const height = 350;
+  const urlRoot = process.env.NODE_ENV === 'production' ? process.env.REACT_APP_API_BASE_URL : 'http://localhost:3001'
 
   return (
     <Box sx={{ mx: 'auto', my: 2 }}>
@@ -27,7 +28,7 @@ const ProductList = ({ products, title, titleVariant, titleAlign }) => {
             <ImageListItem key={product.id} sx={{ textAlign: 'center', p: 2 }}>
               <Link to={`/products/${product.id}`}>
                 <Box component={'img'}
-                  src={`${process.env.REACT_APP_API_BASE_URL}/api/products/images/${product.image.id}?width=${width}&height=${height}`}
+                  src={`${urlRoot}/api/products/images/${product.image.id}?width=${width}&height=${height}`}
                   alt={product.name}
                   loading="lazy"
                   sx={{ maxWidth: '100%', maxHeight: '100%', borderRadius: '2px', boxShadow: 8 }}

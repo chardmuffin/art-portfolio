@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const sgMail = require('@sendgrid/mail');
 const { Order, OrderDetail } = require('../../models');
 const { withAuth } = require('../../utils/helpers');
 
@@ -105,6 +106,61 @@ router.post("/create-payment-intent", async (req, res) => {
   res.send({
     clientSecret: paymentIntent.client_secret,
   });
+});
+
+
+// ================================ SENDGRID =========================================
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+router.post('/send-order-summary', async (req, res) => {
+  const { toEmail, name, subject, orderSummary } = req.body;
+
+  // if toEmail is admin@artbychard.com, it is an email for the seller
+  const templateId = toEmail === 'admin@artbychard.com' ? 'd-a5d948e081714402850208983db058c4' : 'd-f50d09fbf9aa44538dd59ebe902b35f8';
+
+  const msg = {
+    to: toEmail,
+    from: 'admin@artbychard.com',
+    templateId: templateId,
+    dynamicTemplateData: {
+      name,
+      subject,
+      orderSummary,
+    },
+  };
+
+  try {
+    await sgMail.send(msg);
+    res.status(200).json({ message: 'Email sent successfully' });
+  } catch (error) {
+    console.error('Error sending email', error);
+    res.status(500).json({ message: 'Error sending email' });
+  }
+});
+
+router.post('/contact', async (req, res) => {
+  const { name, subject, message, email, phone } = req.body;
+
+  const msg = {
+    to: 'admin@artbychard.com',
+    from: 'admin@artbychard.com',
+    templateId: 'd-406bf391e1674a2ab2be0b9a0d04e416',
+    dynamicTemplateData: {
+      name,
+      subject,
+      message,
+      email,
+      phone
+    },
+  };
+
+  try {
+    await sgMail.send(msg);
+    res.status(200).json({ message: 'Email sent successfully' });
+  } catch (error) {
+    console.error('Error sending email', error);
+    res.status(500).json({ message: 'Error sending email' });
+  }
 });
 
 module.exports = router;

@@ -1,16 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Container, TextField, Button, Box, Grid, Snackbar, Typography, List, ListItem, ListItemText, CardHeader, CardContent, Card, Divider, Slide } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
-import emailjs from 'emailjs-com';
 import { formatDate } from '../utils/helpers';
+import axios from '../utils/axiosConfig';
+import { useNavigate } from 'react-router-dom';
 
-const serviceID = process.env.REACT_APP_EMAILJS_SERVICE_ID;
-const templateID = process.env.REACT_APP_EMAILJS_TEMPLATE_ID;
-const userID = process.env.REACT_APP_EMAILJS_USER_ID;
-
-const PaymentComplete = ({ order, setCart }) => {
-
-  const [userEmail, setUserEmail] = useState('');
+const PaymentComplete = ({ order, setOrder, setCart }) => {
+  const navigate = useNavigate();
+  const [toEmail, setToEmail] = useState('');
+  const [submitEmail, setSubmitEmail] = useState('');
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarType, setSnackbarType] = useState('success');
 
@@ -35,76 +33,82 @@ const PaymentComplete = ({ order, setCart }) => {
         return `- ${item.name} (${item.quantity})${optionsStr}`;
       })
       .join('\n');
+    const emailStr = submitEmail ? `${order.shippingInfo.name} provided an email address: ${submitEmail}\n` : '';
   
   return (
-`${order.shippingInfo.name} purchased the following items on ${formatDate(order.orderDate)}:
+`${emailStr}${order.shippingInfo.name} purchased the following items on ${formatDate(order.orderDate)}:
 ${itemStr}
 
-Order Total: ${order.total}
+Status: ${order.status}
 
+Order Total: ${order.total}
 Ship to:
 ${order.shippingInfo.name}
 ${order.shippingInfo.addressLine1}
 ${order.shippingInfo.addressLine2}
 ${order.shippingInfo.city}, ${order.shippingInfo.state}, ${order.shippingInfo.zip}`
   
-  )}, [order]);
-
-  const sendEmailToSeller = useCallback(() => {
-    emailjs
-      .send(
-        serviceID,
-        templateID,
-        {
-          name: order.shippingInfo.name,
-          subject: "NEW ORDER",
-          message: stringifyOrder(),
-          email: "richardhuffman96+artsales@gmail.com"
-        },
-        userID
-      )
-      .then(
-        (response) => {
-          console.log('Order sent successfully to seller', response);
-        },
-        (error) => {
-          console.error('Order failed to send to seller', error);
-        }
-      );
-  }, [order, stringifyOrder]);
+  )}, [order, submitEmail]);
   
-  const sendEmailToUser = () => {
-    emailjs
-      .send(
-        serviceID,
-        templateID,
-        {
-          name: order.shippingInfo.name,
-          subject: "NEW ORDER WITH CONTACT",
-          message: stringifyOrder(),
-          email: userEmail
-        },
-        userID
-      )
-      .then(
-        (response) => {
-          console.log('Order sent successfully to seller', response);
-          setSnackbarType('success');
-        },
-        (error) => {
-          console.error('Order failed to send to seller', error);
-          setSnackbarType('error');
-        }
-      )
-      .finally(() => {
-        setSnackbarOpen(true);
-      });
+  const sendEmailToUser = async () => {
+    setSubmitEmail(toEmail);
+
+    const data = {
+      toEmail,
+      name: order.shippingInfo.name,
+      subject: 'Your Order Summary',
+      orderSummary: stringifyOrder(),
+    };
+  
+    try {
+      await axios.post('/api/orders/send-order-summary', data);
+      console.log('Order sent successfully to user');
+      setSnackbarType('success');
+    } catch (error) {
+      console.error('Order failed to send to user', error);
+      setSnackbarType('error');
+    } finally {
+      setSnackbarOpen(true);
+    }
   };
 
   useEffect(() => {
     setCart(Array(0));
-    sendEmailToSeller();
-  }, [setCart, sendEmailToSeller])
+    
+    const sendEmailToSeller = async () => {
+
+      const subjectStr = submitEmail !== '' ? `CUSTOMER ${order.shippingInfo.name} has signed up for order updates via email.` : `CUSTOMER ${order.shippingInfo.name} HAS PLACED AN ORDER!`
+      const data = {
+        toEmail: 'admin@artbychard.com',
+        name: order.shippingInfo.name,
+        subject: subjectStr,
+        orderSummary: stringifyOrder(),
+      };
+    
+      try {
+        await axios.post('/api/orders/send-order-summary', data);
+        console.log('Order sent successfully to the seller');
+        
+        // update order status
+        setOrder({
+          ...order,
+          status: 'IN PROCESS'
+        })
+
+        setSubmitEmail('');
+
+      } catch (error) {
+        console.error('Order failed to send to the seller', error);
+      }
+    };
+
+    //redirect home if there is no order placed (user navigated here via url)
+    !order.total
+      ? navigate('/')
+      : // only trigger email to seller if order exists and status is PENDING, or user provided email address
+        (order.status === 'PENDING' || submitEmail !== '') && sendEmailToSeller();
+
+  }, [order, setOrder, setCart, submitEmail, stringifyOrder, navigate])
 
   return (
     <Container component={'main'}>
@@ -192,8 +196,8 @@ ${order.shippingInfo.city}, ${order.shippingInfo.state}, ${order.shippingInfo.zi
                   <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                     <TextField
                       label="Email"
-                      value={userEmail}
-                      onChange={(e) => setUserEmail(e.target.value)}
+                      value={toEmail}
+                      onChange={(e) => setToEmail(e.target.value)}
                       variant="outlined"
                       size="small"
                       sx={{ mt: 1 }}
@@ -224,7 +228,7 @@ ${order.shippingInfo.city}, ${order.shippingInfo.state}, ${order.shippingInfo.zi
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       >
         <MuiAlert onClose={() => setSnackbarOpen(false)} severity={snackbarType} elevation={6} variant="filled">
-          {snackbarType === 'success' ? 'An order summary will be sent to your email within 48 hours.' : 'Failed to set up order updates!'}
+          {snackbarType === 'success' ? 'An order summary has been sent to your inbox.' : 'Failed to set up order updates!'}
         </MuiAlert>
       </Snackbar>
 

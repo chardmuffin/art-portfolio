@@ -3,11 +3,7 @@ import { Container, Grid, Card, CardContent, Typography, Button, Divider, TextFi
 import MuiAlert from '@mui/material/Alert';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
-import emailjs from 'emailjs-com';
-
-const serviceID = process.env.REACT_APP_EMAILJS_SERVICE_ID;
-const templateID = process.env.REACT_APP_EMAILJS_TEMPLATE_ID;
-const userID = process.env.REACT_APP_EMAILJS_USER_ID;
+import axios from '../utils/axiosConfig';
 
 const Contact = () => {
   const initialValues = {
@@ -26,36 +22,30 @@ const Contact = () => {
     phone: Yup.string().notRequired(),
   });
 
-  const handleSubmit = (values, actions) => {
-    emailjs
-      .send(
-        serviceID,
-        templateID,
-        {
-          name: values.name,
-          subject: values.subject,
-          message: values.message,
-          email: values.email,
-          phone: values.phone,
-        },
-        userID
-      )
-      .then(
-        (response) => {
-          console.log('Email sent successfully', response);
-          setSnackbarType('success');
-          setSnackbarOpen(true);
-          actions.setSubmitting(false);
-          actions.resetForm();
-        },
-        (error) => {
-          console.error('Email failed to send', error);
-          setSnackbarType('error');
-          setSnackbarOpen(true);
-          actions.setSubmitting(false);
-        }
-      );
-  };
+  const handleSubmit = async (values, actions) => {
+
+    const data = {
+      name: values.name,
+      subject: values.subject,
+      message: values.message,
+      email: values.email,
+      phone: values.phone
+    };
+  
+    try {
+      await axios.post('/api/orders/contact', data);
+      console.log('Message sent successfully');
+      setSnackbarType('success');
+      actions.setSubmitting(false);
+      actions.resetForm();
+    } catch (error) {
+      console.error('Message failed to send', error);
+      setSnackbarType('error');
+      actions.setSubmitting(false);
+    } finally {
+      setSnackbarOpen(true);
+    }
+}
 
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarType, setSnackbarType] = useState('success');

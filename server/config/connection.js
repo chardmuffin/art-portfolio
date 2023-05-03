@@ -3,7 +3,6 @@ require('dotenv').config({ path: '../.env' });
 
 let sequelize;
 console.log("NODE_ENV:", process.env.NODE_ENV);
-console.log("DATABASE_URL:", process.env.DATABASE_URL);
 
 // create connection to db, passing in MySQL info from .env
 if (process.env.NODE_ENV === 'production') {

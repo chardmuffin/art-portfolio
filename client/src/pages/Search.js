@@ -7,7 +7,6 @@ import {
   InputLabel,
   TextField,
   Checkbox,
-  FormGroup,
   FormControl,
   FormControlLabel,
   Slider,

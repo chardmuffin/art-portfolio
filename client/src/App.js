@@ -100,6 +100,7 @@ function App() {
     total: "",
     shippingInfo: {},
     orderDate: null,
+    status: 'PENDING'
   });
 
   return (
@@ -143,6 +144,7 @@ function App() {
                   <PaymentComplete
                     setCart={setCart}
                     order={order}
+                    setOrder={setOrder}
                   />}
                 />
                 {isLoggedIn && <Route path="/admin-dashboard" element={<AdminDashboard />} />}

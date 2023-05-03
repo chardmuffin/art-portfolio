@@ -39,28 +39,28 @@ router.get('/:id', (req, res) => {
     });
 });
 
-// create a new user
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~UNCOMMENT TO ALLOW ENDPOINT TO CREATE NEW ADMIN USER~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// create a new user 
 // POST /api/users
 // expects {email: 'exampleUser@gmail.com', password: 'password1234'}
-router.post('/', (req, res) => {
-  User.create({
-    email: req.body.email,
-    password: req.body.password
-  })
-    .then(dbUserData => {
-      req.session.save(() => {
-        req.session.user_id = dbUserData.id;
-        req.session.username = dbUserData.username;
-        req.session.loggedIn = true;
+// router.post('/', (req, res) => {
+//   User.create({
+//     email: req.body.email,
+//     password: req.body.password
+//   })
+//     .then(dbUserData => {
+//       req.session.save(() => {
+//         req.session.user_id = dbUserData.id;
+//         req.session.loggedIn = true;
     
-        res.json(dbUserData);
-      });
-    })
-    .catch(err => {
-      console.log(err);
-      res.status(500).json(err);
-    });
-});
+//         res.json(dbUserData);
+//       });
+//     })
+//     .catch(err => {
+//       console.log(err);
+//       res.status(500).json(err);
+//     });
+// });
 
 // login
 // POST /api/users/login

@@ -56,12 +56,13 @@ const StripeCheckoutForm = ({ handleBack, shippingInfo, setOrder, total, cart })
 
     setIsLoading(true);
 
-    // Create the order object
+    // Create the order object in state & localstorage
     setOrder({
       purchasedItems: cart,
       shippingInfo: shippingInfo,
       total: total,
       orderDate: new Date().toISOString(),
+      status: 'PENDING'
     });
 
     const urlRoot = process.env.NODE_ENV === 'production' ? process.env.REACT_APP_API_BASE_URL : 'http://localhost:3000';
