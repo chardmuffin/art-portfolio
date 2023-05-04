@@ -54,6 +54,7 @@ Watch a brief video demo:
 * react-router-dom
 * react-scripts
 * react-stickynode
+* react-swipeable
 * web-vitals
 * yup
 
