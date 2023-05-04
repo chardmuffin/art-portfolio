@@ -27,13 +27,13 @@ export function isLoggedIn() {
 export function formatDate(dateStr) {
   const date = new Date(dateStr);
   const options = {
-    timeZone: 'America/New_York',
+    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     year: 'numeric',
     month: 'long',
     day: 'numeric',
-    hour: '2-digit',
+    hour: 'numeric',
     minute: '2-digit',
-    second: '2-digit',
+    hour12: true,
   };
 
   return new Intl.DateTimeFormat('en-US', options).format(date);

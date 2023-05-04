@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Container, TextField, Button, Box, Grid, Snackbar, Typography, List, ListItem, ListItemText, CardHeader, CardContent, Card, Divider, Slide } from '@mui/material';
+import { Container, TextField, Button, Box, Grid, Snackbar, Typography, List, ListItem, ListItemText, CardHeader, CardContent, Card, Divider, Slide, useMediaQuery } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
 import { formatDate } from '../utils/helpers';
 import axios from '../utils/axiosConfig';
@@ -11,6 +11,7 @@ const PaymentComplete = ({ order, setOrder, setCart }) => {
   const [submitEmail, setSubmitEmail] = useState('');
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarType, setSnackbarType] = useState('success');
+  const smallScreen = useMediaQuery('(max-width: 600px)');
 
   const stringifyOrder = useCallback(() => {
     const itemStr = order.purchasedItems
@@ -118,16 +119,19 @@ ${order.shippingInfo.city}, ${order.shippingInfo.state}, ${order.shippingInfo.zi
             <CardHeader title="Thank you!" sx={{ textAlign: 'center' }} ></CardHeader>
             <CardContent>
               <Divider />
-              <Grid container spacing={2} justifyContent="center">
+              <Grid container spacing={1} justifyContent="center">
                 
-                <Grid item xs={12} >
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography variant='h6' component="h3">Order Summary:</Typography>
-                    <Typography variant='h6'>Total: {order.total}</Typography>
-                  </Box>
+                <Grid item xs={12} sm={6} sx={{ mb: { xs: 0, sm: 1 } }}>
+                  <Typography variant='h6' component="h3">Order for {order.shippingInfo.name.split(' ')[0]}</Typography>
+                </Grid>
+                <Grid item xs={12} sm={6} sx={{ mb: { xs: 2, sm: 1 } }}>
+                  <Typography sx={{ textAlign: { xs: 'left', sm: 'right' } }}>
+                    {formatDate(order.orderDate)}
+                  </Typography>
                 </Grid>
 
-                <Grid item xs={12} md={5}>
+                <Grid item xs={12} sm={5}>
+                  <Typography>Items:</Typography>
                   <List sx={{ p: 0 }}>
                     {order.purchasedItems.map((item, index) => {
                       const options = [];
@@ -155,13 +159,14 @@ ${order.shippingInfo.city}, ${order.shippingInfo.state}, ${order.shippingInfo.zi
                       );
                     })}
                   </List>
+                  <Typography variant='subtitle' component="h4">Total: {order.total}</Typography>
                 </Grid>
 
-                <Grid item xs={1}>
-                  <Divider orientation="vertical"/>
+                <Grid item xs={12} sm={1}>
+                  <Divider orientation={ smallScreen ? "horizontal" : "vertical" }/>
                 </Grid>
 
-                <Grid item xs={12} md={6}>
+                <Grid item xs={12} sm={6}>
                   <Typography variant="h6" component="h4">Ship To:</Typography>
                   <Grid container sx={{ mt: 1, textAlign: 'left' }}>
                     <Grid item xs={3}>
@@ -189,7 +194,7 @@ ${order.shippingInfo.city}, ${order.shippingInfo.state}, ${order.shippingInfo.zi
                   <Divider />
                 </Grid>
 
-                <Grid item xs={12} md={6}>
+                <Grid item xs={12} sm={6}>
                   <Typography textAlign={'center'}>
                     Receive updates about your order?
                   </Typography>

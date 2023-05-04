@@ -12,7 +12,6 @@ import ScrollToTop from './components/ScrollToTop';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import NoMatch from './pages/NoMatch';
-import Profile from './pages/Profile';
 // import Signup from './pages/Signup';
 import Search from './pages/Search';
 import Checkout from './pages/Checkout';
@@ -20,10 +19,10 @@ import About from './pages/About';
 import Product from './pages/Product';
 import Contact from './pages/Contact';
 import AdminDashboard from './pages/AdminDashboard';
+import PaymentComplete from './pages/PaymentComplete';
 
 import { usePersistentState } from './utils/hooks';
 import { isLoggedIn } from './utils/helpers';
-import PaymentComplete from './pages/PaymentComplete';
 
 const ColorModeContext = createContext({ toggleColorMode: () => {} });
 
@@ -122,7 +121,6 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
                 {/* <Route path="/signup" element={<Signup />} /> */}
-                <Route path="/profile" element={<Profile />} />
                 <Route path="/search" element={<Search />} />
                 <Route path="/products/:id" element={
                   <Product

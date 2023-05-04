@@ -42,6 +42,22 @@ router.get('/', (req, res) => {
     });
 });
 
+// get all product ids
+// GET /api/products/ids
+router.get('/ids', (req, res) => {
+  Product.findAll({
+    attributes: {
+      include: 'id',
+      exclude: ["name", "description", "price", "stock", "category_id"]
+    }
+  })
+    .then(dbPostData => res.json(dbPostData))
+    .catch(err => {
+      console.log(err);
+      res.status(500).json(err);
+    });
+});
+
 // get all product options
 // GET /api/products/options
 router.get('/options', (req, res) => {

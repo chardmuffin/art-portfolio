@@ -9,7 +9,6 @@ import {
   Checkbox,
   FormControl,
   FormControlLabel,
-  Slider,
   Select,
   InputAdornment,
   MenuItem,
@@ -22,6 +21,7 @@ import {
   CardHeader,
   Box
 } from '@mui/material';
+import RangeSlider from '../components/RangeSlider';
 
 const Search = () => {
 
@@ -38,7 +38,7 @@ const Search = () => {
     text: '',
     inStockOnly: false,
     category: '',
-    priceRange: [0, 500],
+    priceRange: [20, 280],
   });
 
   const handleFilterChange = (filterName, filterValue) => {
@@ -48,27 +48,44 @@ const Search = () => {
     }));
   };
 
-  const filteredProducts = data ? data.filter((product) => {
-    if (filters.inStockOnly && product.stock <= 0) {
-      return false;
-    }
-    if (filters.priceRange && (product.price < filters.priceRange[0] || product.price > filters.priceRange[1])) {
-      return false;
-    }
-    if ((filters.category !== 'All' && filters.category !== '') && product.category.name !== filters.category) {
-      return false;
-    }
-    if (
-      filters.text &&
-      !product.name.toLowerCase().includes(filters.text.toLowerCase())
-    ) {
-      return false;
-    }
-    return true;
-  }) : [];
+  const handlePriceChange = (event, newValue) => {
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      priceRange: newValue,
+    }));
+  };
+
+  const filteredProducts = data
+  ? data.filter((product) => {
+      if (filters.inStockOnly && product.stock <= 0) {
+        return false;
+      }
+      if (
+        filters.priceRange &&
+        (product.price < filters.priceRange[0] ||
+          product.price > filters.priceRange[1])
+      ) {
+        return false;
+      }
+      if (
+        (filters.category !== "All" && filters.category !== "") &&
+        product.category.name !== filters.category
+      ) {
+        return false;
+      }
+      if (
+        filters.text &&
+        !product.name.toLowerCase().includes(filters.text.toLowerCase())
+      ) {
+        return false;
+      }
+      return true;
+    })
+  : [];
 
   const categories = ['All', ...new Set(data?.map((product) => product.category.name))];
 
+  // if small screen, wrap the content in a card
   const ConditionalWrapper = ({ condition, wrapper, children }) => 
     condition ? wrapper(children) : children;
 
@@ -120,18 +137,15 @@ const Search = () => {
               </Select>
             </FormControl>
             
-            <InputLabel>Price Range</InputLabel>
-            <Slider
-              value={filters.priceRange}
-              onChange={(e, newValue) => {
-                handleFilterChange('priceRange', newValue);
-              }}
-              valueLabelDisplay="auto"
-              min={0}
-              max={500}
-              step={10}
-              sx={{ width: '90%', mx: 'auto' }}
-            />
+            <Box>
+              <InputLabel>Price Range</InputLabel>
+              <RangeSlider
+                priceRange={filters.priceRange}
+                handlePriceChange={handlePriceChange}
+              />
+            </Box>
+
+              
             <FormControlLabel
               label="Only show products in stock"
               control={

@@ -2,23 +2,73 @@ import { useState, useEffect } from 'react';
 import { Snackbar, Box, CircularProgress, Container, Typography, useMediaQuery, FormControl, InputLabel, MenuItem, Select, Divider, Grid, Button, IconButton, Slide } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import DoneIcon from '@mui/icons-material/Done';
-import { useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import axios from '../utils/axiosConfig';
 import { useQuery } from 'react-query';
+import { useSwipeable } from 'react-swipeable';
 import { toMoneyFormat } from '../utils/helpers';
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 const Product = ({ handleAddToCart }) => {
 
-  // get the product id from url
+  // get the current product id from url
   const { id } = useParams();
+
+  // ======================== for navigate from product to product ===================================
+  // query get all possible product ids
+  const fetchAllProductIds = async () => {
+    const response = await axios('/api/products/ids', {
+      responseType: 'json',
+    });
+    return response.data;
+  };
+  const { data: allProductIds } = useQuery('productIds', () => fetchAllProductIds());
+  const navigate = useNavigate();
+  
+  const idArray = allProductIds?.map((product) => product.id);
+  const findAdjacentProductIds = (currentId, idArray) => {
+    if (!idArray) return { prevId: null, nextId: null };
+  
+    const currentIndex = idArray.findIndex((productId) => productId === parseInt(currentId));
+    const prevId = currentIndex > 0 ? idArray[currentIndex - 1] : null;
+    const nextId = currentIndex < idArray.length - 1 ? idArray[currentIndex + 1] : null;
+  
+    return { prevId, nextId };
+  };
+  const { prevId, nextId } = findAdjacentProductIds(id, idArray);
+
+  // for mobile
+  const handleSwipeLeft = () => {
+    if (nextId) {
+      navigate(`/products/${nextId}`);
+    }
+  };
+  
+  const handleSwipeRight = () => {
+    if (prevId) {
+      navigate(`/products/${prevId}`);
+    }
+  };
+  
+  const swipeHandlers = useSwipeable({
+    onSwipedLeft: handleSwipeLeft,
+    onSwipedRight: handleSwipeRight,
+  });
+
+  //======================================= handle product page ====================================================
+  const fetchProductData = async (id) => {
+    const response = await axios(`/api/products/${id}/options`, {
+      responseType: 'json',
+    });
+    return response.data;
+  };
 
   // query get all possible product options by product id
   // const product = product and productOptions data
-  const { isLoading, isError, data: product, error } = useQuery('productOptions', () =>
-    axios(`/api/products/${id}/options`, {
-      responseType: 'json',
-    }).then((response) => response.data)
-  );
+  const { data: product, isLoading, isError, error, refetch } = useQuery(['productOptions', id], () => fetchProductData(id), {
+    enabled: false, // Disable initial fetch since we will trigger it manually
+  });
 
   // query get all option groups
   // example response (after calculating availableGroups)
@@ -27,11 +77,21 @@ const Product = ({ handleAddToCart }) => {
   //   { "id": 1, "name": "Size", "options": [{ "id": 3, "name": "Large" }] },
   //   { "id": 3, "name": "Type", "options": [{ "id": 7, "name": "Original" }, { "id": 8, "name": "Print" }] }
   // ];
-  const { isLoading: isLoadingOptionGroups, isError: isErrorOptionGroups, data: optionGroups, error: errorOptionGroups } = useQuery('optionGroups', () =>
+  const { isLoading: isLoadingOptionGroups, isError: isErrorOptionGroups, data: optionGroups, error: errorOptionGroups, refetch: refetchOptionGroups } = useQuery('optionGroups', () =>
     axios(`/api/options/groups`, {
       responseType: 'json',
     }).then((response) => response.data)
   );
+
+  // navigation helper
+  useEffect(() => {
+    refetch(); // refetch the product data when the `id` changes
+    refetchOptionGroups() // refetch option groups when 'id' changes
+    setForm({
+      options: [null, null, null],
+      selectedItem: null
+    }); // reset form
+  }, [id, refetch, refetchOptionGroups]);
 
   // selectedItem is an object that will contain the product data AND the selected productOption's data (based on combination of chosen options)
   const [form, setForm] = useState({
@@ -51,7 +111,7 @@ const Product = ({ handleAddToCart }) => {
   const [showAlert, setShowAlert] = useState(false);
 
   const smallScreen = useMediaQuery('(max-width: 600px)');
-  const mediumScreen = useMediaQuery('(max-width: 960px)');
+  const mediumScreen = useMediaQuery('(max-width: 900px)');
   const width = smallScreen ? 300 : mediumScreen ? 550 : 800;
   const height = smallScreen ? 400 : 700;
   const urlRoot = process.env.NODE_ENV === 'production' ? process.env.REACT_APP_API_BASE_URL : 'http://localhost:3001'
@@ -151,8 +211,17 @@ const Product = ({ handleAddToCart }) => {
       {product && (
         <Box sx={{ mx: 'auto', my: 2, textAlign: 'center' }}>
           <Grid container spacing={4}>
+            <Grid item xs={12} sx={{ textAlign: 'left' }}>
+              <Box component={Link} to={"/"} sx={{ mt: 4, color: 'inherit', textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+                <ArrowBackIosNewIcon fontSize='small' />
+                <Typography>
+                  Back to Gallery
+                </Typography>
+              </Box>
+            </Grid>
+
             <Grid item xs={12} md={8}>
-              <Box component={'img'}
+              <Box key={product.id} component={'img'}
                 src={`${urlRoot}/api/products/images/${product.image.id}?width=${width}&height=${height}`}
                 alt={product.name}
                 loading="lazy"
@@ -162,8 +231,10 @@ const Product = ({ handleAddToCart }) => {
                   borderRadius: '2px',
                   maxWidth: '100%'
                 }}
+                {...(mediumScreen ? swipeHandlers : {})} // Add swipe handlers to the image only on smaller screens
               />
-            </ Grid>
+            </Grid>
+
             <Grid item xs={12} md={4}>
               <Box sx={{ my: 2, fontStyle: 'italic', textAlign: 'left', letterSpacing: 2 }}>
                 <Typography variant='h4' component="h2" >
@@ -172,45 +243,46 @@ const Product = ({ handleAddToCart }) => {
                 <Typography sx={{ mt: 2 }}>
                   Fine Art by Richard Huffman
                 </Typography>
-                <Typography>
-                  {priceRangeString}
-                </Typography>
+                {stock > 0 &&
+                  <Typography>
+                    {priceRangeString}
+                  </Typography>
+                }
               </Box>
               
               <Divider sx={{ my: 2 }} />
 
               {availableGroups.length > 0 && (
-                <Box sx={{ mx: 'auto', my: 2, textAlign: 'center', display: 'flex', width: '100%' }}>
+                <Grid
+                  container
+                  direction="column"
+                  sx={{ mx: 'auto', my: 2, textAlign: 'center', width: '100%' }}
+                  key={product.id}
+                >
                   {availableGroups.map((optionGroup, index) => (
-                    <FormControl
-                      fullWidth
-                      key={`option-group-${index + 1}`}
-                      sx={{ mx: 1, my: 1 }}
-                    >
-                      <InputLabel
-                        id={`option-group-${index + 1}-label`}
-                      >
-                        {optionGroup.name}
-                      </InputLabel>
-                      <Select
-                        labelId={`option-group-${index + 1}-label`}
-                        value={form.options[index] || ''}
-                        onChange={(e) => handleFormChange(index, e.target.value)}
-                        fullWidth
-                      >
-                        {optionGroup.options?.map((opt) => (
-                          <MenuItem
-                            key={opt.id}
-                            value={opt.name}
-                          >
-                            {opt.name}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
+                    <Grid item key={`option-group-${index + 1}`}>
+                      <FormControl fullWidth sx={{ mx: 1, my: 1 }}>
+                        <InputLabel id={`option-group-${index + 1}-label`}>
+                          {optionGroup.name}
+                        </InputLabel>
+                        <Select
+                          labelId={`option-group-${index + 1}-label`}
+                          value={form.options[index] || ''}
+                          onChange={(e) => handleFormChange(index, e.target.value)}
+                          fullWidth
+                        >
+                          {optionGroup.options?.map((opt) => (
+                            <MenuItem key={opt.id} value={opt.name}>
+                              {opt.name}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Grid>
                   ))}
-                </Box>
+                </Grid>
               )}
+
               {stock <= 3 && (
                 stock > 0
                 ? <Typography sx={{ fontStyle: 'italic', textAlign: 'center', mb: 2, mt: -1 }}>
@@ -220,6 +292,7 @@ const Product = ({ handleAddToCart }) => {
                     SOLD
                   </Typography>
               )}
+
               {((form.selectedItem?.product_option || availableGroups.length <= 0) && stock >= 1) &&
                 <Box sx={{ mx: 'auto', my: 2, textAlign: 'center', display: 'flex', flexWrap: 'nowrap', justifyContent: 'space-between', alignItems: 'center' }}>
                   <Typography variant='h5' component='h3' sx={{ textAlign: 'left' }}>
@@ -236,8 +309,31 @@ const Product = ({ handleAddToCart }) => {
                   </Button>
                 </Box>
               }
-              
             </Grid>
+
+            {!mediumScreen &&
+              <Grid item xs={12} >
+                <Grid container>
+                  <Grid item xs={6}>
+                    <Box component={Link} to={prevId ? `/products/${prevId}` : '#'} sx={{ color: 'inherit', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <ArrowBackIosNewIcon fontSize='small' />
+                      <Typography>
+                        Previous
+                      </Typography>
+                    </Box>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Box component={Link} to={nextId ? `/products/${nextId}` : '#'} sx={{ color: 'inherit', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Typography>
+                        Next
+                      </Typography>
+                      <ArrowForwardIosIcon fontSize='small' />
+                    </Box>
+                  </Grid>
+                </Grid>
+              </Grid>
+            }
+
           </Grid>
 
           <Divider sx={{ my: 2 }} />
@@ -250,6 +346,7 @@ const Product = ({ handleAddToCart }) => {
           </Typography>
         </Box>
       )}
+
       <Snackbar
         open={showAlert}
         autoHideDuration={4000}
@@ -273,6 +370,7 @@ const Product = ({ handleAddToCart }) => {
           </IconButton>
         }
       />
+
     </Container>
   );
 };

@@ -39,7 +39,7 @@ const Header = ({ window, cartCount, ColorModeContext, isCartAnimating }) => {
   const drawer = (
     <>
       <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center' }}>
-        <Box component={Link} to={'/'} sx={{color: 'inherit', textDecoration: 'none' }}>
+        <Box component={Link} to={'/'} sx={{ color: 'inherit', textDecoration: 'none' }}>
           <Typography variant="h6" component="h1" mt={2}>
             Richard Huffman
           </Typography>
