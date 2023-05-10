@@ -1,5 +1,6 @@
 import React from 'react';
-import { Container, Grid, Card, CardHeader, Divider, CardContent, Typography, Link } from '@mui/material';
+import { Container, Grid, Card, CardHeader, Divider, CardContent, Typography} from '@mui/material';
+import { Link } from "react-router-dom";
 
 const About = () => {
   return (
@@ -25,12 +26,12 @@ const About = () => {
               <Typography variant="body1">
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;In Richard's studio, brushstrokes come alive, colors harmonize on the canvas, and emotions are beautifully captured. Each artwork is a testament to Richard's dedication and a reflection of the artist's genuine passion for creating meaningful and engaging art.
               </Typography>
-              <Typography variant="body1" sx={{ my: 2 }}>
+              <Typography variant="body1" sx={{ mt: 2, display: 'inline' }}>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;For deeper insights into Richard's artistic process, inspirations, or to discuss commissioning a personalized piece, feel free to
                 {' '}
-                <Link to={"/contact"}> reach out</Link>
-                . Richard welcomes the opportunity to connect with art enthusiasts, collectors, and fellow creators.
               </Typography>
+              <Typography component={Link} to={"/checkout"} sx={{ display: 'inline' }}> reach out</Typography>
+              <Typography sx={{ display: 'inline' }}>. Richard welcomes the opportunity to connect with art enthusiasts, collectors, and fellow creators.</Typography>
             </CardContent>
           </Card>
         </Grid>
