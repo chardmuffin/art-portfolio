@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Snackbar, Box, CircularProgress, Container, Typography, useMediaQuery, FormControl, InputLabel, MenuItem, Select, Divider, Grid, Button, IconButton, Slide } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
-import DoneIcon from '@mui/icons-material/Done';
+import { Snackbar, Box, CircularProgress, Container, Typography, useMediaQuery, FormControl, InputLabel, MenuItem, Select, Divider, Grid, Button, Slide } from '@mui/material';
+import MuiAlert from '@mui/material/Alert';
+import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import axios from '../utils/axiosConfig';
 import { useQuery } from 'react-query';
@@ -349,27 +349,23 @@ const Product = ({ handleAddToCart }) => {
 
       <Snackbar
         open={showAlert}
-        autoHideDuration={4000}
+        autoHideDuration={6000}
         onClose={() => setShowAlert(false)}
         TransitionComponent={Slide}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-        message={
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <DoneIcon fontSize='small' sx={{ mr: 1 }} /> 
-            <Typography variant='body1'>Added to cart!</Typography>
+      >
+        <MuiAlert onClose={() => setShowAlert(false)} severity="success" elevation={6} variant="filled" sx={{ width: '100%' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Typography>
+              Added to Cart!
+            </Typography>
+            <Typography component={Link} to={"/checkout"} sx={{ ml: 6, display: 'flex', alignItems: 'center' }}>
+              <ShoppingCartCheckoutIcon size="small" />
+              Checkout
+            </Typography>
           </Box>
-        }
-        action={
-          <IconButton
-            size="small"
-            aria-label="close"
-            color="inherit"
-            onClick={() => setShowAlert(false)}
-          >
-            <CloseIcon fontSize="small" />
-          </IconButton>
-        }
-      />
+        </MuiAlert>
+      </Snackbar>
 
     </Container>
   );
