@@ -30,7 +30,7 @@ const About = () => {
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;For deeper insights into Richard's artistic process, inspirations, or to discuss commissioning a personalized piece, feel free to
                 {' '}
               </Typography>
-              <Typography component={Link} to={"/checkout"} sx={{ display: 'inline' }}> reach out</Typography>
+              <Typography component={Link} to={"/contact"} sx={{ display: 'inline' }}> reach out</Typography>
               <Typography sx={{ display: 'inline' }}>. Richard welcomes the opportunity to connect with art enthusiasts, collectors, and fellow creators.</Typography>
             </CardContent>
           </Card>
