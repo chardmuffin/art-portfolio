@@ -12,6 +12,7 @@ export default function RangeSlider({ priceRange, handlePriceChange, maxPrice })
     handlePriceChange(event, newValue);
   };
   
+  const roundedMax = maxPrice % 10 === 0 ? maxPrice : Math.ceil(maxPrice / 10) * 10;
 
   return (
     <Slider
@@ -20,7 +21,7 @@ export default function RangeSlider({ priceRange, handlePriceChange, maxPrice })
       onChangeCommitted={handleCommit}
       valueLabelDisplay="auto"
       min={0}
-      max={maxPrice + 20}
+      max={roundedMax}
       step={10}
     />
   );

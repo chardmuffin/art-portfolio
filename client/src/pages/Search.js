@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ProductList from '../components/ProductList';
 import axios from '../utils/axiosConfig';
 import { useQuery } from 'react-query';
@@ -34,29 +34,37 @@ const Search = () => {
     }).then((response) => response.data)
   );
 
-  // Fetch product options data
-  const { data: productOptionsData } = useQuery('productOptions', () =>
+  // Calculate min and max price
+  const [maxPrice, setMaxPrice] = useState(null);
+  useEffect(() => {
     axios(`/api/products/options`, {
       responseType: 'json',
-    }).then((response) => response.data)
-  );
+    })
+      .then((response) => {
+        let maxPrice = -Infinity;
+        response.data.forEach(option => {
+          const price = Number(option.product.price) + Number(option.price_difference);
+          maxPrice = Math.max(maxPrice, price);
+        });
+        setMaxPrice(Math.ceil(maxPrice / 10) * 10);
+      });
+  }, []);
 
-  // Calculate min and max price
-  let minPrice = Infinity;
-  let maxPrice = -Infinity;
-  if (productOptionsData) {
-    productOptionsData.forEach(option => {
-      const price = Number(option.product.price) + Number(option.price_difference);
-      minPrice = Math.min(minPrice, price);
-      maxPrice = Math.max(maxPrice, price);
-    });
-  }
+  // ensures initial filter value in price range is not set until maxPrice is calculated
+  useEffect(() => {
+    if (maxPrice !== null) {
+      setFilters((prevFilters) => ({
+        ...prevFilters,
+        priceRange: [prevFilters.priceRange[0], maxPrice],
+      }));
+    }
+  }, [maxPrice]);
 
   const [filters, setFilters] = useState({
     text: '',
     inStockOnly: false,
     category: '',
-    priceRange: [20, maxPrice],
+    priceRange: [10, 20],
   });
 
   const handleFilterChange = (filterName, filterValue) => {
@@ -157,11 +165,13 @@ const Search = () => {
             
             <Box>
               <InputLabel>Price Range</InputLabel>
-              <RangeSlider
-                priceRange={filters.priceRange}
-                handlePriceChange={handlePriceChange}
-                maxPrice={maxPrice}
-              />
+              {maxPrice && (
+                <RangeSlider
+                  priceRange={filters.priceRange}
+                  handlePriceChange={handlePriceChange}
+                  maxPrice={maxPrice}
+                />
+              )}
             </Box>
 
               
