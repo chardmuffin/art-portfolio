@@ -34,11 +34,29 @@ const Search = () => {
     }).then((response) => response.data)
   );
 
+  // Fetch product options data
+  const { data: productOptionsData } = useQuery('productOptions', () =>
+    axios(`/api/products/options`, {
+      responseType: 'json',
+    }).then((response) => response.data)
+  );
+
+  // Calculate min and max price
+  let minPrice = Infinity;
+  let maxPrice = -Infinity;
+  if (productOptionsData) {
+    productOptionsData.forEach(option => {
+      const price = Number(option.product.price) + Number(option.price_difference);
+      minPrice = Math.min(minPrice, price);
+      maxPrice = Math.max(maxPrice, price);
+    });
+  }
+
   const [filters, setFilters] = useState({
     text: '',
     inStockOnly: false,
     category: '',
-    priceRange: [20, 280],
+    priceRange: [20, maxPrice],
   });
 
   const handleFilterChange = (filterName, filterValue) => {
@@ -142,6 +160,7 @@ const Search = () => {
               <RangeSlider
                 priceRange={filters.priceRange}
                 handlePriceChange={handlePriceChange}
+                maxPrice={maxPrice}
               />
             </Box>
 

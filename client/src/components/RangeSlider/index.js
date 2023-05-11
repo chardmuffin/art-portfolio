@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import Slider from '@mui/material/Slider';
 
-export default function RangeSlider({ priceRange, handlePriceChange }) {
+export default function RangeSlider({ priceRange, handlePriceChange, maxPrice }) {
   const [localPriceRange, setLocalPriceRange] = useState(priceRange);
 
   const handleChange = (event, newValue) => {
@@ -20,7 +20,7 @@ export default function RangeSlider({ priceRange, handlePriceChange }) {
       onChangeCommitted={handleCommit}
       valueLabelDisplay="auto"
       min={0}
-      max={300}
+      max={maxPrice + 20}
       step={10}
     />
   );
