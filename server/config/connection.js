@@ -15,6 +15,12 @@ if (process.env.NODE_ENV === 'production') {
       idle: 10000,
     },
   });
+} else if (process.env.NODE_ENV === 'test') {
+  sequelize = new Sequelize(process.env.MYSQL_TEST_DATABASE, 'root', process.env.MYSQL_ROOT_PASSWORD, {
+    host: 'localhost',
+    port: process.env.DB_PORT,
+    dialect: 'mysql'
+  });
 } else {
   sequelize = new Sequelize(process.env.MYSQL_DATABASE, 'root', process.env.MYSQL_ROOT_PASSWORD, {
     host: 'localhost',

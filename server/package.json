@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "jest",
+    "test": "concurrently \"cross-env NODE_ENV=test npm run start\" \"sleep 5 && jest\"",
     "start": "node server.js",
     "develop": "nodemon server.js localhost 3001"
   },
@@ -25,6 +25,7 @@
     "stripe": "^11.14.0"
   },
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "jest": "^29.4.3",
     "nodemon": "^2.0.20"
   }
